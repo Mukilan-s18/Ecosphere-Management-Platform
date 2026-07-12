@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Access environment variables for Supabase connection
-const supabaseUrl = process.env.SUPABASE_URL || 'YOUR_SUPABASE_URL';
-const supabaseKey = process.env.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY';
+// Access environment variables for Supabase connection (Next.js client-side prefix)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'YOUR_SUPABASE_URL';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY';
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
