@@ -1,29 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-// Assuming M1 will provide these in lib/supabase. 
-// import { uploadProof, insertParticipation } from "@/lib/supabase";
+import { uploadProof, getChallenges, supabase } from "@/lib/supabase";
 
-// Mock functions until M1 is ready with lib/supabase.ts
-const uploadProof = async (file: File) => {
-  return new Promise<string>((resolve) => setTimeout(() => resolve("https://mock-url.com/proof.jpg"), 1000));
+const insertParticipation = async (userId: number, challengeId: number, url: string) => {
+  const { error } = await supabase
+    .from('participations')
+    .insert({ user_id: userId, challenge_id: challengeId, proof_url: url, status: 'pending' });
+  if (error) throw error;
 };
-
-const insertParticipation = async (userId: string, challengeId: string, url: string) => {
-  return new Promise<void>((resolve) => setTimeout(resolve, 500));
-};
-
-const challenges = [
-  { id: "1", title: "Beach Cleanup", description: "Help clean the local beach this weekend. Every piece of trash removed counts towards our corporate environmental goals.", xp: 50 },
-  { id: "2", title: "Tree Plantation", description: "Plant a tree in your neighborhood. Contribute to our carbon offset initiatives.", xp: 100 },
-  { id: "3", title: "Zero Waste Sprint", description: "Produce zero waste for a whole week. Take the ultimate sustainability challenge.", xp: 150 },
-];
 
 export default function SocialPage() {
+  const [challenges, setChallenges] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchChallenges = async () => {
+      const { data } = await getChallenges();
+      if (data) setChallenges(data);
+    };
+    fetchChallenges();
+  }, []);
+
   return (
     <div className="p-8">
       <h1 className="text-3xl font-bold mb-6">CSR Activities & Challenges</h1>
@@ -51,7 +52,7 @@ function ChallengeCard({ challenge }: { challenge: { id: string; title: string; 
     setLoading(true);
     try {
       // Hardcoded userId until auth is ready from M1
-      const mockUserId = "user_123";
+      const mockUserId = 1; // using integer ID as per schema
       
       const url = await uploadProof(file);
       await insertParticipation(mockUserId, challenge.id, url);
@@ -81,7 +82,7 @@ function ChallengeCard({ challenge }: { challenge: { id: string; title: string; 
       </CardHeader>
       <CardContent>
         <div className="text-sm font-bold text-green-500 mb-6 px-3 py-1 bg-green-500/10 inline-block rounded-full">
-          +{challenge.xp} XP
+          +{challenge.xp_reward || challenge.xp} XP
         </div>
         
         {!joined ? (
