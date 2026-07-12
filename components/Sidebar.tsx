@@ -100,7 +100,7 @@ export function Sidebar() {
 
       {/* Mobile sidebar */}
       <aside
-        className={`md:hidden fixed top-0 left-0 z-40 h-screen w-64 border-r border-slate-800 bg-black flex flex-col transition-transform duration-300 ${
+        className={`md:hidden fixed top-0 left-0 z-40 h-screen w-64 border-r border-slate-800 bg-slate-950 flex flex-col transition-transform duration-300 ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -108,7 +108,7 @@ export function Sidebar() {
       </aside>
 
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex w-64 border-r border-slate-800 h-screen fixed left-0 bg-black flex-col">
+      <aside className="hidden md:flex w-64 border-r border-slate-800 h-screen fixed left-0 bg-slate-950 flex-col">
         <NavContent pathname={pathname} setMobileOpen={setMobileOpen} />
       </aside>
     </>
