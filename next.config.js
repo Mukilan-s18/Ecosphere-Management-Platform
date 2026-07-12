@@ -40,10 +40,10 @@ const securityHeaders = [
       // Next.js requires 'unsafe-inline' for styles in dev; tighten in prod
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
-      // Next.js scripts need unsafe-eval in dev mode
+      // Next.js requires 'unsafe-inline' for hydration scripts in production unless using nonces
       process.env.NODE_ENV === "development"
         ? "script-src 'self' 'unsafe-eval' 'unsafe-inline'"
-        : "script-src 'self'",
+        : "script-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https:",
       // Supabase storage
       "connect-src 'self' https://*.supabase.co https://generativelanguage.googleapis.com",
