@@ -4,8 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import { Sparkles, TreePine, Car, Zap, Droplets, Share2, Download, ChevronRight, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import html2canvas from "html2canvas";
-import { jsPDF } from "jspdf";
 
 const fallbackQuarterData = {
   quarter: "Q2 2026",
@@ -151,6 +149,8 @@ export default function WrappedPage() {
     if (!slideRef.current) return;
     toast.info("Generating PDF report...", { description: "Your EcoSphere Wrapped PDF will be ready shortly." });
     try {
+      const html2canvas = (await import("html2canvas")).default;
+      const { jsPDF } = await import("jspdf");
       const canvas = await html2canvas(slideRef.current, { scale: 2, backgroundColor: '#020617' });
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [canvas.width, canvas.height] });
