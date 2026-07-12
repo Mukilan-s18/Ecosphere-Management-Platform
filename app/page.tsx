@@ -1,10 +1,22 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts"
+import dynamic from "next/dynamic"
+
+const EmissionsChart = dynamic(
+  () => import("@/components/EmissionsChart"),
+  { 
+    ssr: false, 
+    loading: () => (
+      <div className="flex h-full w-full items-center justify-center text-sm text-muted-foreground">
+        Loading chart...
+      </div>
+    )
+  }
+)
 import {
   Leaf,
   TrendingUp,
@@ -18,6 +30,8 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { supabase } from "@/lib/supabase"
+import { fallbackDashboardStats } from "@/lib/fallback-data"
 
 const stats = [
   {
@@ -120,7 +134,32 @@ function getCategoryVariant(category: string) {
 }
 
 export default function DashboardPage() {
-  const router = useRouter()
+  const [liveStats, setLiveStats] = useState(fallbackDashboardStats)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchDashboardStats = async () => {
+      try {
+        const { data: users, error: err1 } = await supabase.from('users').select('id')
+        const { data: participations, error: err2 } = await supabase.from('participations').select('id').eq('status', 'approved')
+        
+        if (!err1 && users) {
+          setLiveStats((prev) => ({ ...prev, activeParticipants: users.length }))
+        }
+        if (!err2 && participations) {
+           // mock offset calculation based on participations
+           const offset = 12.4 + (participations.length * 0.5)
+           setLiveStats((prev) => ({ ...prev, carbonOffset: `${offset.toFixed(1)} tCO₂e` }))
+        }
+      } catch (e) {
+        console.error("Failed to load live stats")
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchDashboardStats()
+  }, [])
+
   return (
     <div className="space-y-8">
       {/* Hero Header */}
@@ -136,41 +175,72 @@ export default function DashboardPage() {
             </p>
           </div>
         </div>
-        <Tabs defaultValue="dashboard" className="w-[300px]">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="dashboard">Overview</TabsTrigger>
-            <TabsTrigger value="analytics" onClick={() => router.push('/reports')}>
-              Reports
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <div className="flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground w-[300px]">
+          <Link
+            href="/"
+            className="inline-flex flex-1 items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all bg-background text-foreground shadow-sm"
+          >
+            Overview
+          </Link>
+          <Link
+            href="/reports"
+            className="inline-flex flex-1 items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all hover:bg-background/50 hover:text-foreground"
+          >
+            Reports
+          </Link>
+        </div>
       </div>
 
       {/* Stats Grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => {
-          const Icon = stat.icon
-          return (
-            <Card key={stat.label}>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardDescription className="text-sm font-medium">{stat.label}</CardDescription>
-                <Icon className="size-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <div className="flex items-center gap-1 mt-1">
-                  <TrendingUp className="size-3 text-emerald-500" />
-                  <span className="text-xs text-emerald-500 font-medium">
-                    {stat.change}
-                  </span>
-                  <span className="text-xs text-muted-foreground ml-1">
-                    {stat.description}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-          )
-        })}
+        <Card className="border-slate-800 bg-slate-900/50">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Carbon Offset</CardTitle>
+            <Leaf className="size-4 text-green-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">{liveStats.carbonOffset}</div>
+            <p className="text-xs text-muted-foreground mt-1 text-green-400">
+              +18.2% This quarter vs. last
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="border-slate-800 bg-slate-900/50">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Active Participants</CardTitle>
+            <Users className="size-4 text-blue-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">{liveStats.activeParticipants}</div>
+            <p className="text-xs text-muted-foreground mt-1 text-blue-400">
+              +12.5% Across all departments
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="border-slate-800 bg-slate-900/50">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Compliance Score</CardTitle>
+            <ShieldAlert className="size-4 text-amber-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">{liveStats.complianceScore}%</div>
+            <p className="text-xs text-muted-foreground mt-1 text-amber-400">
+              Stable Governance alignment
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="border-slate-800 bg-slate-900/50">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Total Emissions</CardTitle>
+            <TrendingUp className="size-4 text-red-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">{liveStats.totalEmissions}</div>
+            <p className="text-xs text-muted-foreground mt-1 text-red-400">
+              -12.0% Year over year
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Main Grid */}
@@ -185,18 +255,7 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={trendData}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
-                    <XAxis dataKey="month" className="text-xs fill-muted-foreground" />
-                    <YAxis className="text-xs fill-muted-foreground" />
-                    <Tooltip
-                      contentStyle={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}
-                      itemStyle={{ color: 'var(--card-foreground)' }}
-                    />
-                    <Line type="monotone" dataKey="co2" className="stroke-primary" strokeWidth={3} dot={{ fill: 'var(--primary)' }} />
-                  </LineChart>
-                </ResponsiveContainer>
+                <EmissionsChart data={trendData} />
               </div>
             </CardContent>
           </Card>
@@ -278,6 +337,33 @@ export default function DashboardPage() {
                     <span className="font-bold text-primary">{dept.score}/100</span>
                   </div>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Department Face-Off (Tug-of-War) */}
+          <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex justify-between items-center text-lg">
+                <span>Department Face-Off</span>
+                <span className="text-xs font-normal text-muted-foreground bg-background px-2 py-1 rounded-full animate-pulse border">Live 🔥</span>
+              </CardTitle>
+              <CardDescription>IT Services vs Office Operations</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex h-10 rounded-full overflow-hidden border border-border shadow-inner">
+                <div
+                  style={{ width: `${(95 / (95 + 92)) * 100}%` }}
+                  className="bg-emerald-500 flex items-center justify-end pr-3 text-xs font-bold text-white transition-all duration-1000"
+                >
+                  IT (95)
+                </div>
+                <div
+                  style={{ width: `${(92 / (95 + 92)) * 100}%` }}
+                  className="bg-blue-500 flex items-center pl-3 text-xs font-bold text-white transition-all duration-1000"
+                >
+                  Office (92)
+                </div>
               </div>
             </CardContent>
           </Card>
