@@ -126,6 +126,11 @@ export default function DashboardPage() {
   const router = useRouter()
   const [liveStats, setLiveStats] = useState(fallbackDashboardStats)
   const [loading, setLoading] = useState(true)
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   useEffect(() => {
     const fetchDashboardStats = async () => {
@@ -245,18 +250,24 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={trendData}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
-                    <XAxis dataKey="month" className="text-xs fill-muted-foreground" />
-                    <YAxis className="text-xs fill-muted-foreground" />
-                    <Tooltip
-                      contentStyle={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}
-                      itemStyle={{ color: 'var(--card-foreground)' }}
-                    />
-                    <Line type="monotone" dataKey="co2" className="stroke-primary" strokeWidth={3} dot={{ fill: 'var(--primary)' }} />
-                  </LineChart>
-                </ResponsiveContainer>
+                {isMounted ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={trendData}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
+                      <XAxis dataKey="month" className="text-xs fill-muted-foreground" />
+                      <YAxis className="text-xs fill-muted-foreground" />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}
+                        itemStyle={{ color: 'var(--card-foreground)' }}
+                      />
+                      <Line type="monotone" dataKey="co2" className="stroke-primary" strokeWidth={3} dot={{ fill: 'var(--primary)' }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-sm text-muted-foreground">
+                    Loading chart...
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
