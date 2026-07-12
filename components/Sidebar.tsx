@@ -7,6 +7,7 @@ import {
   Settings,
   ClipboardCheck,
   Shield,
+  Trophy,
 } from "lucide-react"
 
 export function Sidebar() {
@@ -14,6 +15,7 @@ export function Sidebar() {
     { name: "Dashboard", path: "/", icon: LayoutDashboard },
     { name: "Environmental", path: "/environmental", icon: Leaf },
     { name: "Social", path: "/social", icon: Users },
+    { name: "Gamification", path: "/gamification", icon: Trophy },
     { name: "Manager Review", path: "/manager", icon: ClipboardCheck },
     { name: "Governance", path: "/governance", icon: Shield },
     { name: "Reports", path: "/reports", icon: FileText },
