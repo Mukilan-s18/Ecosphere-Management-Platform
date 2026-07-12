@@ -69,7 +69,7 @@ Follow these instructions to get a local copy of EcoSphere up and running.
    npm install
    ```
 
-3. **Configure Environment Variables**
+3. **Configure Environment Variables:**<br/>
    Create a `.env.local` file in the root of the project and add your Supabase credentials:
    ```env
    NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
@@ -81,7 +81,7 @@ Follow these instructions to get a local copy of EcoSphere up and running.
    npm run dev
    ```
 
-5. **Explore the App**
+5. **Explore the App:**<br/>
    Open [http://localhost:3000](http://localhost:3000) with your browser to see the platform in action.
 
 ## 📁 Project Structure
