@@ -165,10 +165,12 @@ export default function DashboardPage() {
             </p>
           </div>
         </div>
-        <Tabs defaultValue="dashboard" className="w-[300px]">
+        <Tabs defaultValue="dashboard" className="w-[300px]" onValueChange={(val) => {
+          if (val === "analytics") router.push('/reports')
+        }}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="dashboard">Overview</TabsTrigger>
-            <TabsTrigger value="analytics" onClick={() => router.push('/reports')}>
+            <TabsTrigger value="analytics">
               Reports
             </TabsTrigger>
           </TabsList>
