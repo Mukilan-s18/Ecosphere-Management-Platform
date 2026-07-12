@@ -126,7 +126,9 @@ export default function WrappedPage() {
 
   const handleShare = () => {
     const url = typeof window !== 'undefined' ? window.location.href : '';
-    navigator.clipboard.writeText(url);
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url);
+    }
     toast.success("Link copied to clipboard!", {
       description: "Share your quarterly impact summary with your team.",
     });
@@ -330,7 +332,7 @@ export default function WrappedPage() {
         {currentSlide < slides.length - 1 && (
           <button
             onClick={next}
-            className="absolute right-6 bottom-6 p-3 rounded-full bg-slate-800 hover:bg-slate-700 text-white transition-all hover:scale-110"
+            className="absolute right-6 bottom-6 p-3 rounded-full bg-slate-800 hover:bg-slate-700 text-white transition-all hover:scale-110 z-20"
           >
             <ChevronRight className="w-5 h-5" />
           </button>
