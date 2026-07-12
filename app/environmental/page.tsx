@@ -82,6 +82,14 @@ export default function EnvironmentalGoals() {
 
   const handleCreateOrder = (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (itemQuantity <= 0 || isNaN(itemQuantity)) {
+      toast.error("Invalid Quantity", {
+        description: "Purchase quantity must be a positive number greater than 0.",
+      })
+      return
+    }
+    
     // Open the nudge popup if they haven't opted for the green alternative
     if (!selectedAlternative) {
       setIsNudgeOpen(true)
@@ -321,7 +329,7 @@ export default function EnvironmentalGoals() {
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-slate-300">
               <p>
-                <strong>EcoSphere's Green Nudging</strong> integrates carbon footprint intelligence directly into daily enterprise software workflows (like ERPs and travel platforms).
+                <strong>EcoSphere&apos;s Green Nudging</strong> integrates carbon footprint intelligence directly into daily enterprise software workflows (like ERPs and travel platforms).
               </p>
               <p>
                 Instead of simply reporting emissions after they occur, the platform acts as an active constraint and helper:
@@ -356,7 +364,7 @@ export default function EnvironmentalGoals() {
             <CardContent className="space-y-4">
               <div className="space-y-2 text-sm">
                 <p className="text-slate-300">
-                  By switching your requisition to <strong className="text-white">"{activeItem.altName}"</strong>:
+                  By switching your requisition to <strong className="text-white">&quot;{activeItem.altName}&quot;</strong>:
                 </p>
                 <div className="grid grid-cols-2 gap-3 mt-3 bg-slate-950 p-3 rounded-lg border border-slate-800">
                   <div className="text-center">

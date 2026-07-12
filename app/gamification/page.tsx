@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trophy, Medal, Award } from "lucide-react"; // Assuming M4 installed lucide-react
-
+import { Trophy, Medal, Award, AlertCircle, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { fallbackLeaderboard } from "@/lib/fallback-data";
 
 const getLeaderboard = async () => {
   try {
@@ -50,20 +50,26 @@ const badges = [
   { id: 6, name: "🔌 Energy Star", description: "Powered down workstation consistently after hours." },
 ];
 
+interface LeaderboardEntry {
+  employee: string;
+  xp: number;
+}
+
 export default function GamificationPage() {
-  const [leaderboard, setLeaderboard] = useState<any[]>([]);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isOffline, setIsOffline] = useState(false);
   
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        // In reality: const data = await getLeaderboard() from M1
         const data = await getLeaderboard();
-        // Sort by XP DESC to guarantee order
         const sorted = [...data].sort((a, b) => b.xp - a.xp);
         setLeaderboard(sorted);
       } catch (error) {
         console.error("Failed to load leaderboard", error);
+        setLeaderboard(fallbackLeaderboard);
+        setIsOffline(true);
       } finally {
         setLoading(false);
       }
@@ -81,6 +87,13 @@ export default function GamificationPage() {
     }
   };
 
+  const getEcoAvatar = (xp: number) => {
+    if (xp < 200) return { emoji: "🌱", label: "Seedling" };
+    if (xp < 500) return { emoji: "🌿", label: "Sprout" };
+    if (xp < 900) return { emoji: "🌳", label: "Young Tree" };
+    return { emoji: "🎋", label: "Bamboo Champion" };
+  };
+
   return (
     <div className="p-8 space-y-12 animate-in fade-in duration-500">
       
@@ -91,22 +104,35 @@ export default function GamificationPage() {
           <h1 className="text-3xl font-bold">Company Leaderboard</h1>
         </div>
         
+        {isOffline && (
+          <div className="mb-4 flex items-center gap-2 rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-4 py-2 text-sm text-yellow-400">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            Using demo data — live database temporarily unavailable.
+          </div>
+        )}
+        
         <div className="rounded-md border bg-card text-card-foreground shadow-sm">
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/50 hover:bg-muted/50">
                 <TableHead className="w-[100px] text-center">Rank</TableHead>
                 <TableHead>Employee</TableHead>
+                <TableHead className="text-center w-[100px]">Eco Level</TableHead>
                 <TableHead className="text-right">Total XP</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
-                <TableRow>
-                  <TableCell colSpan={3} className="text-center py-8 text-muted-foreground">
-                    Loading leaderboard data...
-                  </TableCell>
-                </TableRow>
+                <>
+                  {[...Array(5)].map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell><div className="h-5 w-8 mx-auto rounded bg-muted animate-pulse" /></TableCell>
+                      <TableCell><div className="h-5 w-40 rounded bg-muted animate-pulse" /></TableCell>
+                      <TableCell><div className="h-8 w-8 mx-auto rounded-full bg-muted animate-pulse" /></TableCell>
+                      <TableCell><div className="h-5 w-20 ml-auto rounded bg-muted animate-pulse" /></TableCell>
+                    </TableRow>
+                  ))}
+                </>
               ) : (
                 leaderboard.map((row, index) => (
                   <TableRow key={index} className="hover:bg-muted/30 transition-colors">
@@ -117,6 +143,10 @@ export default function GamificationPage() {
                       </div>
                     </TableCell>
                     <TableCell className="font-semibold">{row.employee}</TableCell>
+                    <TableCell className="text-center">
+                      <span className="text-2xl" title={getEcoAvatar(row.xp).label}>{getEcoAvatar(row.xp).emoji}</span>
+                      <div className="text-[10px] text-muted-foreground">{getEcoAvatar(row.xp).label}</div>
+                    </TableCell>
                     <TableCell className="text-right font-bold text-green-500">{row.xp} XP</TableCell>
                   </TableRow>
                 ))

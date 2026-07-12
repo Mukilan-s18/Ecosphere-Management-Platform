@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Montserrat, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Sidebar } from "@/components/Sidebar";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "sonner";
+import { ESGOracle } from "@/components/ESGOracle";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const montserrat = Montserrat({
+  variable: "--font-sans",
   subsets: ["latin"],
 });
 
@@ -29,21 +30,22 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${montserrat.variable} ${geistMono.variable} font-sans h-full antialiased dark`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex bg-background text-foreground">
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
-          enableSystem
+          forcedTheme="dark"
           disableTransitionOnChange
         >
           <Sidebar />
-          <main className="flex-1 ml-64 p-8 min-h-screen overflow-y-auto">
+          <main className="flex-1 p-8 min-h-screen overflow-y-auto w-full min-w-0 transition-all duration-300">
             {children}
           </main>
-          <Toaster richColors position="bottom-right" />
+          <ESGOracle />
+          <Toaster richColors position="top-center" theme="dark" />
         </ThemeProvider>
       </body>
     </html>

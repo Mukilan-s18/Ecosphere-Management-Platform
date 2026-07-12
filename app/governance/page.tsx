@@ -159,6 +159,19 @@ export default function GovernancePage() {
         </p>
       </div>
 
+      {/* ESG Oracle Banner */}
+      <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-emerald-200/90 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex size-10 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400">
+            <span className="text-xl">🌿</span>
+          </div>
+          <div>
+            <h3 className="font-semibold text-emerald-400">Try the new ESG Oracle!</h3>
+            <p className="text-sm opacity-90">Got governance or compliance questions? Ask our AI assistant in the bottom right.</p>
+          </div>
+        </div>
+      </div>
+
       {/* Stats Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Compliance Score */}
