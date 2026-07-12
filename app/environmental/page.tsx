@@ -209,6 +209,86 @@ export default function EnvironmentalGoals() {
             </CardContent>
           </Card>
 
+          {/* Department Carbon Tracking */}
+          <Card className="border-slate-800 bg-slate-900/50">
+            <CardHeader>
+              <CardTitle>Department Carbon Tracking</CardTitle>
+              <CardDescription>Scope 1 & 2 Emissions Breakdown by Department</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-200 font-medium">Manufacturing</span>
+                    <span className="text-slate-400">1,250 tCO2e</span>
+                  </div>
+                  <div className="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
+                    <div className="h-full bg-red-500 w-[65%]"></div>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-200 font-medium">Logistics & Fleet</span>
+                    <span className="text-slate-400">480 tCO2e</span>
+                  </div>
+                  <div className="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
+                    <div className="h-full bg-amber-500 w-[25%]"></div>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-200 font-medium">Office Operations</span>
+                    <span className="text-slate-400">192 tCO2e</span>
+                  </div>
+                  <div className="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
+                    <div className="h-full bg-emerald-500 w-[10%]"></div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Emission Factor Configuration */}
+          <Card className="border-slate-800 bg-slate-900/50">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <div>
+                <CardTitle>Emission Factor Configuration</CardTitle>
+                <CardDescription>Master data for automated carbon calculations</CardDescription>
+              </div>
+              <Button variant="outline" size="sm" className="h-8 border-slate-700 bg-slate-900 text-xs">
+                + Add Factor
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-slate-800 hover:bg-transparent">
+                    <TableHead>Category</TableHead>
+                    <TableHead>Emission Source</TableHead>
+                    <TableHead className="text-right">Multiplier</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow className="border-slate-800">
+                    <TableCell className="font-medium text-slate-300">Electricity</TableCell>
+                    <TableCell className="text-slate-400">Grid Mix (US Avg)</TableCell>
+                    <TableCell className="text-right text-emerald-400 font-mono">0.385 kg/kWh</TableCell>
+                  </TableRow>
+                  <TableRow className="border-slate-800">
+                    <TableCell className="font-medium text-slate-300">Fleet</TableCell>
+                    <TableCell className="text-slate-400">Diesel Fuel</TableCell>
+                    <TableCell className="text-right text-emerald-400 font-mono">2.68 kg/L</TableCell>
+                  </TableRow>
+                  <TableRow className="border-slate-800">
+                    <TableCell className="font-medium text-slate-300">Travel</TableCell>
+                    <TableCell className="text-slate-400">Short-Haul Flight</TableCell>
+                    <TableCell className="text-right text-emerald-400 font-mono">0.15 kg/km</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
           {/* Interactive ERP Green Nudging Simulator */}
           <Card className="border-slate-800 bg-slate-900/50 relative overflow-hidden">
             <div className="absolute top-0 right-0 p-3 bg-emerald-500/10 rounded-bl-lg border-l border-b border-emerald-500/20 text-emerald-400 flex items-center gap-1.5 text-xs font-semibold">

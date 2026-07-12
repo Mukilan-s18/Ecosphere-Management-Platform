@@ -329,7 +329,7 @@ export default function ReportsBuilder() {
         {/* Standard Custom Report Builder */}
         <div className="bg-slate-900/50 border border-slate-800 rounded-lg p-6 space-y-8">
           <h2 className="text-lg font-semibold">Custom Report Builder</h2>
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-3">
               <label className="text-sm font-medium text-slate-300">Date Range</label>
               <Select defaultValue="this-year">
@@ -371,6 +371,51 @@ export default function ReportsBuilder() {
                   <SelectItem value="environmental">Environmental Only</SelectItem>
                   <SelectItem value="social">Social Only</SelectItem>
                   <SelectItem value="governance">Governance Only</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-slate-300">Employee</label>
+              <Select defaultValue="all">
+                <SelectTrigger className="bg-slate-950 border-slate-800">
+                  <SelectValue placeholder="Select Employee" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Employees</SelectItem>
+                  <SelectItem value="sarah-chen">Sarah Chen</SelectItem>
+                  <SelectItem value="marcus-johnson">Marcus Johnson</SelectItem>
+                  <SelectItem value="elena-rodriguez">Elena Rodriguez</SelectItem>
+                  <SelectItem value="david-kim">David Kim</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-slate-300">Challenge</label>
+              <Select defaultValue="all">
+                <SelectTrigger className="bg-slate-950 border-slate-800">
+                  <SelectValue placeholder="Select Challenge" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Challenges</SelectItem>
+                  <SelectItem value="c1">Sustainability Sprint</SelectItem>
+                  <SelectItem value="c2">Recycle Challenge</SelectItem>
+                  <SelectItem value="c3">Commute Green</SelectItem>
+                  <SelectItem value="c5">Water Conservation</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-slate-300">ESG Category</label>
+              <Select defaultValue="all">
+                <SelectTrigger className="bg-slate-950 border-slate-800">
+                  <SelectValue placeholder="Select Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  <SelectItem value="emissions">Carbon Emissions</SelectItem>
+                  <SelectItem value="diversity">Diversity & Inclusion</SelectItem>
+                  <SelectItem value="compliance">Regulatory Compliance</SelectItem>
+                  <SelectItem value="training">Employee Training</SelectItem>
                 </SelectContent>
               </Select>
             </div>

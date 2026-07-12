@@ -19,10 +19,16 @@ export default function SettingsPage() {
   })
 
   const [notifications, setNotifications] = useState({
-    challengeReminders: true,
-    approvalNotifications: true,
-    leaderboardUpdates: false,
-    complianceAlerts: true,
+    newComplianceIssue: true,
+    approvalDecisions: true,
+    policyReminders: false,
+    badgeUnlocks: true,
+  })
+
+  const [businessRules, setBusinessRules] = useState({
+    autoEmissionCalc: true,
+    evidenceRequirement: true,
+    badgeAutoAward: true,
   })
 
   const [compliance, setCompliance] = useState({
@@ -42,6 +48,10 @@ export default function SettingsPage() {
 
   function toggleNotifications(key: keyof typeof notifications) {
     setNotifications((prev) => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  function toggleBusinessRules(key: keyof typeof businessRules) {
+    setBusinessRules((prev) => ({ ...prev, [key]: !prev[key] }))
   }
 
   function toggleCompliance(key: keyof typeof compliance) {
@@ -156,6 +166,68 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
+          {/* Business Rules Engine */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Settings className="h-5 w-5 text-indigo-500" />
+                <CardTitle>Business Rules Engine</CardTitle>
+              </div>
+              <CardDescription>
+                Core configuration toggles for automated platform behaviors
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex items-center justify-between gap-4">
+                <div className="space-y-0.5">
+                  <Label htmlFor="auto-emission" className="text-sm font-medium">
+                    Auto Emission Calculation
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    Automatically calculate carbon from linked ERP transactions
+                  </p>
+                </div>
+                <Switch
+                  id="auto-emission"
+                  checked={businessRules.autoEmissionCalc}
+                  onCheckedChange={() => toggleBusinessRules("autoEmissionCalc")}
+                />
+              </div>
+
+              <div className="flex items-center justify-between gap-4">
+                <div className="space-y-0.5">
+                  <Label htmlFor="evidence-req" className="text-sm font-medium">
+                    Evidence Requirement
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    Require proof files for CSR Activity participation approvals
+                  </p>
+                </div>
+                <Switch
+                  id="evidence-req"
+                  checked={businessRules.evidenceRequirement}
+                  onCheckedChange={() => toggleBusinessRules("evidenceRequirement")}
+                />
+              </div>
+
+              <div className="flex items-center justify-between gap-4">
+                <div className="space-y-0.5">
+                  <Label htmlFor="badge-auto" className="text-sm font-medium">
+                    Badge Auto-Award
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    Automatically assign badges based on metrics
+                  </p>
+                </div>
+                <Switch
+                  id="badge-auto"
+                  checked={businessRules.badgeAutoAward}
+                  onCheckedChange={() => toggleBusinessRules("badgeAutoAward")}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Notification Preferences */}
           <Card>
             <CardHeader>
@@ -170,65 +242,65 @@ export default function SettingsPage() {
             <CardContent className="space-y-6">
               <div className="flex items-center justify-between gap-4">
                 <div className="space-y-0.5">
-                  <Label htmlFor="challenge-reminders" className="text-sm font-medium">
-                    Challenge Reminders
+                  <Label htmlFor="new-compliance-issue" className="text-sm font-medium">
+                    New compliance issue raised
                   </Label>
                   <p className="text-xs text-muted-foreground">
-                    Send reminders for upcoming and in-progress challenges
+                    Notify owners when a compliance audit fails or policy is violated
                   </p>
                 </div>
                 <Switch
-                  id="challenge-reminders"
-                  checked={notifications.challengeReminders}
-                  onCheckedChange={() => toggleNotifications("challengeReminders")}
+                  id="new-compliance-issue"
+                  checked={notifications.newComplianceIssue}
+                  onCheckedChange={() => toggleNotifications("newComplianceIssue")}
                 />
               </div>
 
               <div className="flex items-center justify-between gap-4">
                 <div className="space-y-0.5">
-                  <Label htmlFor="approval-notifications" className="text-sm font-medium">
-                    Approval Notifications
+                  <Label htmlFor="approval-decisions" className="text-sm font-medium">
+                    CSR/Challenge approval decisions
                   </Label>
                   <p className="text-xs text-muted-foreground">
-                    Notify managers when submissions require approval
+                    Notify employees when their CSR/Challenge submissions are approved or rejected
                   </p>
                 </div>
                 <Switch
-                  id="approval-notifications"
-                  checked={notifications.approvalNotifications}
-                  onCheckedChange={() => toggleNotifications("approvalNotifications")}
+                  id="approval-decisions"
+                  checked={notifications.approvalDecisions}
+                  onCheckedChange={() => toggleNotifications("approvalDecisions")}
                 />
               </div>
 
               <div className="flex items-center justify-between gap-4">
                 <div className="space-y-0.5">
-                  <Label htmlFor="leaderboard-updates" className="text-sm font-medium">
-                    Leaderboard Updates
+                  <Label htmlFor="policy-reminders" className="text-sm font-medium">
+                    Policy acknowledgement reminders
                   </Label>
                   <p className="text-xs text-muted-foreground">
-                    Weekly digest of leaderboard position changes
+                    Send reminders to employees who have pending policy acknowledgements
                   </p>
                 </div>
                 <Switch
-                  id="leaderboard-updates"
-                  checked={notifications.leaderboardUpdates}
-                  onCheckedChange={() => toggleNotifications("leaderboardUpdates")}
+                  id="policy-reminders"
+                  checked={notifications.policyReminders}
+                  onCheckedChange={() => toggleNotifications("policyReminders")}
                 />
               </div>
 
               <div className="flex items-center justify-between gap-4">
                 <div className="space-y-0.5">
-                  <Label htmlFor="compliance-alerts" className="text-sm font-medium">
-                    Compliance Alerts
+                  <Label htmlFor="badge-unlocks" className="text-sm font-medium">
+                    Badge unlocks
                   </Label>
                   <p className="text-xs text-muted-foreground">
-                    Critical alerts for compliance deadlines and policy changes
+                    Notify users when they automatically earn a new badge
                   </p>
                 </div>
                 <Switch
-                  id="compliance-alerts"
-                  checked={notifications.complianceAlerts}
-                  onCheckedChange={() => toggleNotifications("complianceAlerts")}
+                  id="badge-unlocks"
+                  checked={notifications.badgeUnlocks}
+                  onCheckedChange={() => toggleNotifications("badgeUnlocks")}
                 />
               </div>
             </CardContent>
@@ -340,6 +412,68 @@ export default function SettingsPage() {
                   <Badge variant="default">Supabase</Badge>
                   <Badge variant="secondary">GHG Protocol API</Badge>
                   <Badge variant="outline">UN SDG Tracker</Badge>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Master Data Administration */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Settings className="h-5 w-5 text-emerald-500" />
+                <CardTitle>Master Data Administration</CardTitle>
+              </div>
+              <CardDescription>
+                Manage system-wide classifications and departments
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid gap-6 md:grid-cols-2">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-base font-semibold text-slate-200">Departments</Label>
+                    <Button variant="outline" size="sm" className="h-8 border-slate-700 bg-slate-900/50 hover:bg-slate-800 text-xs">
+                      + Add Dept
+                    </Button>
+                  </div>
+                  <div className="rounded-md border border-slate-800 bg-slate-950">
+                    <div className="p-3 text-sm text-slate-300 border-b border-slate-800 flex justify-between">
+                      <span>Logistics</span>
+                      <span className="text-slate-500 text-xs hover:text-emerald-400 cursor-pointer">Edit</span>
+                    </div>
+                    <div className="p-3 text-sm text-slate-300 border-b border-slate-800 flex justify-between">
+                      <span>Manufacturing</span>
+                      <span className="text-slate-500 text-xs hover:text-emerald-400 cursor-pointer">Edit</span>
+                    </div>
+                    <div className="p-3 text-sm text-slate-300 flex justify-between">
+                      <span>Human Resources</span>
+                      <span className="text-slate-500 text-xs hover:text-emerald-400 cursor-pointer">Edit</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-base font-semibold text-slate-200">ESG Categories</Label>
+                    <Button variant="outline" size="sm" className="h-8 border-slate-700 bg-slate-900/50 hover:bg-slate-800 text-xs">
+                      + Add Category
+                    </Button>
+                  </div>
+                  <div className="rounded-md border border-slate-800 bg-slate-950">
+                    <div className="p-3 text-sm text-slate-300 border-b border-slate-800 flex justify-between">
+                      <span>Carbon Emissions</span>
+                      <span className="text-slate-500 text-xs hover:text-emerald-400 cursor-pointer">Edit</span>
+                    </div>
+                    <div className="p-3 text-sm text-slate-300 border-b border-slate-800 flex justify-between">
+                      <span>Diversity & Inclusion</span>
+                      <span className="text-slate-500 text-xs hover:text-emerald-400 cursor-pointer">Edit</span>
+                    </div>
+                    <div className="p-3 text-sm text-slate-300 flex justify-between">
+                      <span>Employee Training</span>
+                      <span className="text-slate-500 text-xs hover:text-emerald-400 cursor-pointer">Edit</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>
