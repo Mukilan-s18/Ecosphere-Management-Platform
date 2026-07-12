@@ -4,30 +4,34 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
-import { uploadProof, getChallenges, supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 
-const insertParticipation = async (userId: number, challengeId: number, url: string) => {
-  const { error } = await supabase
-    .from('participations')
-    .insert({ user_id: userId, challenge_id: challengeId, proof_url: url, status: 'pending' });
-  if (error) throw error;
+// Mock until M1 supabase is ready
+const mockChallenges = [
+  { id: "1", title: "Beach Cleanup", description: "Help clean the local beach this weekend. Every piece of trash removed counts towards our corporate environmental goals.", xp_reward: 50 },
+  { id: "2", title: "Tree Plantation", description: "Plant a tree in your neighborhood. Contribute to our carbon offset initiatives.", xp_reward: 100 },
+  { id: "3", title: "Zero Waste Sprint", description: "Produce zero waste for a whole week. Take the ultimate sustainability challenge.", xp_reward: 150 },
+];
+
+const mockUploadProof = async (file: File): Promise<string> => {
+  return new Promise((resolve) => setTimeout(() => resolve("https://mock-url.com/proof.jpg"), 1000));
+};
+
+const mockInsertParticipation = async (userId: number, challengeId: string, url: string): Promise<void> => {
+  return new Promise((resolve) => setTimeout(resolve, 500));
 };
 
 export default function SocialPage() {
   const [challenges, setChallenges] = useState<any[]>([]);
 
   useEffect(() => {
-    const fetchChallenges = async () => {
-      const { data } = await getChallenges();
-      if (data) setChallenges(data);
-    };
-    fetchChallenges();
+    // Will be replaced with: const { data } = await getChallenges();
+    setChallenges(mockChallenges);
   }, []);
 
   return (
     <div className="p-8">
-      <h1 className="text-3xl font-bold mb-6">CSR Activities & Challenges</h1>
+      <h1 className="text-3xl font-bold mb-6">CSR Activities &amp; Challenges</h1>
       <div className="flex flex-row gap-6 flex-wrap">
         {challenges.map((challenge) => (
           <ChallengeCard key={challenge.id} challenge={challenge} />
@@ -37,11 +41,10 @@ export default function SocialPage() {
   );
 }
 
-function ChallengeCard({ challenge }: { challenge: { id: string; title: string; description: string; xp: number } }) {
+function ChallengeCard({ challenge }: { challenge: { id: string; title: string; description: string; xp_reward: number } }) {
   const [joined, setJoined] = useState(false);
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
-  const { toast } = useToast();
 
   const handleJoin = () => {
     setJoined(true);
@@ -51,24 +54,18 @@ function ChallengeCard({ challenge }: { challenge: { id: string; title: string; 
     if (!file) return;
     setLoading(true);
     try {
-      // Hardcoded userId until auth is ready from M1
-      const mockUserId = 1; // using integer ID as per schema
-      
-      const url = await uploadProof(file);
-      await insertParticipation(mockUserId, challenge.id, url);
-      
-      toast({
-        title: "Evidence submitted for review!",
+      const mockUserId = 1;
+      const url = await mockUploadProof(file);
+      await mockInsertParticipation(mockUserId, challenge.id, url);
+
+      toast.success("Evidence submitted for review!", {
         description: `Your proof for "${challenge.title}" has been uploaded.`,
       });
-      
+
       setJoined(false);
       setFile(null);
     } catch (error) {
-      toast({
-        title: "Error submitting evidence",
-        variant: "destructive",
-      });
+      toast.error("Error submitting evidence");
     } finally {
       setLoading(false);
     }
@@ -82,9 +79,9 @@ function ChallengeCard({ challenge }: { challenge: { id: string; title: string; 
       </CardHeader>
       <CardContent>
         <div className="text-sm font-bold text-green-500 mb-6 px-3 py-1 bg-green-500/10 inline-block rounded-full">
-          +{challenge.xp_reward || challenge.xp} XP
+          +{challenge.xp_reward} XP
         </div>
-        
+
         {!joined ? (
           <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white" onClick={handleJoin}>
             Join
@@ -95,18 +92,18 @@ function ChallengeCard({ challenge }: { challenge: { id: string; title: string; 
               <label htmlFor="picture" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 Upload Evidence
               </label>
-              <Input 
+              <Input
                 id="picture"
-                type="file" 
-                accept="image/*" 
+                type="file"
+                accept="image/*"
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
                 className="cursor-pointer"
               />
             </div>
-            <Button 
-              className="w-full" 
-              variant="default" 
-              onClick={handleSubmit} 
+            <Button
+              className="w-full"
+              variant="default"
+              onClick={handleSubmit}
               disabled={loading || !file}
             >
               {loading ? "Uploading..." : "Submit Evidence"}
