@@ -20,8 +20,16 @@ const insertParticipation = async (userId: number, challengeId: number, url: str
   if (error) throw error;
 };
 
+interface Challenge {
+  id: number;
+  title: string;
+  description: string;
+  xp_reward?: number;
+  xp?: number;
+}
+
 export default function SocialPage() {
-  const [challenges, setChallenges] = useState<any[]>([]);
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(true);
   const [isOffline, setIsOffline] = useState(false);
 
@@ -85,7 +93,7 @@ export default function SocialPage() {
 function ChallengeCard({
   challenge,
 }: {
-  challenge: { id: any; title: string; description: string; xp_reward?: number; xp?: number };
+  challenge: Challenge;
 }) {
   const [joined, setJoined] = useState(false);
   const [submitting, setSubmitting] = useState(false);
