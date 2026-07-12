@@ -45,7 +45,7 @@ export default function RootLayout({
             {children}
           </main>
           <ESGOracle />
-          <Toaster richColors position="bottom-right" theme="dark" toastOptions={{ className: "mb-20" }} style={{ bottom: "80px" }} />
+          <Toaster richColors position="top-center" theme="dark" />
         </ThemeProvider>
       </body>
     </html>

@@ -119,10 +119,7 @@ export function ESGOracle() {
       {/* Floating Toggle Button */}
       <button
         id="esg-oracle-toggle"
-        onPointerDown={(e) => {
-          e.preventDefault();
-          setIsOpen((prev) => !prev);
-        }}
+        onClick={() => setIsOpen((prev) => !prev)}
         className={`fixed bottom-6 right-6 z-[9999] flex items-center gap-2 rounded-full px-4 py-3 font-semibold text-sm shadow-2xl transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${
           isOpen
             ? "bg-slate-700 text-white hover:bg-slate-600"
