@@ -69,12 +69,7 @@ export default function SocialPage() {
         </div>
       </div>
 
-      {isOffline && (
-        <div className="flex items-center gap-2 rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-4 py-2 text-sm text-yellow-400 mb-6">
-          <AlertCircle className="w-4 h-4 shrink-0" />
-          Using demo data — live database temporarily unavailable.
-        </div>
-      )}
+
 
       {/* Workforce & Culture Metrics */}
       <div className="grid gap-6 md:grid-cols-2 mb-8">
