@@ -7,6 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -31,6 +32,8 @@ const audits = [
     description: "Board Diversity Compliance Review",
     severity: "Medium" as const,
     status: "Completed" as const,
+    owner: "Sarah Chen",
+    dueDate: "2026-06-15",
   },
   {
     id: "AUD-2026-042",
@@ -38,6 +41,8 @@ const audits = [
     description: "Scope 3 GHG Emissions Verification",
     severity: "High" as const,
     status: "In Progress" as const,
+    owner: "Marcus Johnson",
+    dueDate: "2026-08-30",
   },
   {
     id: "AUD-2026-043",
@@ -45,6 +50,8 @@ const audits = [
     description: "Supply Chain Labor Standards Audit",
     severity: "High" as const,
     status: "In Progress" as const,
+    owner: "Elena Rodriguez",
+    dueDate: "2026-07-05", // Overdue in July 2026
   },
   {
     id: "AUD-2026-044",
@@ -52,6 +59,8 @@ const audits = [
     description: "Anti-Bribery & Corruption Policy Review",
     severity: "Critical" as const,
     status: "Pending" as const,
+    owner: "David Kim",
+    dueDate: "2026-07-01", // Overdue
   },
   {
     id: "AUD-2026-045",
@@ -59,6 +68,8 @@ const audits = [
     description: "ISO 14001 Environmental Management Certification",
     severity: "Low" as const,
     status: "Completed" as const,
+    owner: "Sarah Chen",
+    dueDate: "2026-05-20",
   },
   {
     id: "AUD-2026-046",
@@ -66,6 +77,8 @@ const audits = [
     description: "Employee Health & Safety Compliance",
     severity: "Medium" as const,
     status: "Completed" as const,
+    owner: "Marcus Johnson",
+    dueDate: "2026-06-01",
   },
   {
     id: "AUD-2026-047",
@@ -73,6 +86,8 @@ const audits = [
     description: "Carbon Credit Verification & Offset Validation",
     severity: "High" as const,
     status: "In Progress" as const,
+    owner: "Elena Rodriguez",
+    dueDate: "2026-10-15",
   },
   {
     id: "AUD-2026-048",
@@ -80,6 +95,8 @@ const audits = [
     description: "Executive Compensation Transparency Report",
     severity: "Low" as const,
     status: "Completed" as const,
+    owner: "David Kim",
+    dueDate: "2026-04-30",
   },
 ]
 
@@ -253,39 +270,128 @@ export default function GovernancePage() {
                 <TableHead className="w-[140px]">Audit ID</TableHead>
                 <TableHead className="w-[140px]">Category</TableHead>
                 <TableHead>Description</TableHead>
+                <TableHead className="w-[140px]">Owner</TableHead>
+                <TableHead className="w-[120px]">Due Date</TableHead>
                 <TableHead className="w-[110px]">Severity</TableHead>
                 <TableHead className="w-[120px] text-right">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {audits.map((audit) => (
-                <TableRow key={audit.id}>
-                  <TableCell className="font-mono text-sm font-medium">
-                    {audit.id}
-                  </TableCell>
-                  <TableCell>
-                    <span className="flex items-center gap-2">
-                      {categoryIcon(audit.category)}
-                      {audit.category}
-                    </span>
-                  </TableCell>
-                  <TableCell>{audit.description}</TableCell>
-                  <TableCell>
-                    <Badge variant={severityBadgeVariant(audit.severity)}>
-                      {audit.severity}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Badge variant={statusBadgeVariant(audit.status)}>
-                      {audit.status}
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {audits.map((audit) => {
+                // Determine if overdue
+                const isOverdue = audit.status !== "Completed" && new Date(audit.dueDate) < new Date("2026-07-12");
+                
+                return (
+                  <TableRow key={audit.id}>
+                    <TableCell className="font-mono text-sm font-medium">
+                      {audit.id}
+                    </TableCell>
+                    <TableCell>
+                      <span className="flex items-center gap-2">
+                        {categoryIcon(audit.category)}
+                        {audit.category}
+                      </span>
+                    </TableCell>
+                    <TableCell>{audit.description}</TableCell>
+                    <TableCell className="text-muted-foreground">{audit.owner}</TableCell>
+                    <TableCell>
+                      <span className={`flex items-center gap-1.5 ${isOverdue ? "text-red-500 font-semibold" : "text-muted-foreground"}`}>
+                        {isOverdue && <AlertTriangle className="w-3.5 h-3.5" />}
+                        {audit.dueDate}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={severityBadgeVariant(audit.severity)}>
+                        {audit.severity}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Badge variant={statusBadgeVariant(audit.status)}>
+                        {audit.status}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
+
+      {/* ESG Policies & Acknowledgements */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-semibold tracking-tight">
+              ESG Policies &amp; Acknowledgements
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Manage active organizational policies and employee sign-offs
+            </p>
+          </div>
+          <Button variant="outline" className="border-emerald-500/50 text-emerald-500 hover:bg-emerald-500/10">
+            Upload New Policy
+          </Button>
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-2">
+          {/* Policy 1 */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex justify-between items-start">
+                <div>
+                  <CardTitle className="text-base">Anti-Bribery &amp; Corruption Policy</CardTitle>
+                  <CardDescription className="text-xs mt-1">Version 2.4 • Last updated Jan 2026</CardDescription>
+                </div>
+                <Badge variant="outline" className="border-green-500 text-green-500 bg-green-500/10">Active</Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-300">Employee Acknowledgement Rate</span>
+                  <span className="font-semibold text-emerald-400">95%</span>
+                </div>
+                <Progress value={95} className="h-2" />
+                <p className="text-xs text-muted-foreground mt-2">
+                  142 of 150 required employees have signed.
+                </p>
+                <Button variant="secondary" size="sm" className="w-full mt-4 text-xs">
+                  Send Reminder to Pending
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Policy 2 */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex justify-between items-start">
+                <div>
+                  <CardTitle className="text-base">Supplier Code of Conduct</CardTitle>
+                  <CardDescription className="text-xs mt-1">Version 1.1 • Last updated Mar 2026</CardDescription>
+                </div>
+                <Badge variant="outline" className="border-green-500 text-green-500 bg-green-500/10">Active</Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-300">Vendor Acknowledgement Rate</span>
+                  <span className="font-semibold text-amber-400">68%</span>
+                </div>
+                <Progress value={68} className="h-2 [&>div]:bg-amber-500" />
+                <p className="text-xs text-muted-foreground mt-2">
+                  34 of 50 key suppliers have signed.
+                </p>
+                <Button variant="secondary" size="sm" className="w-full mt-4 text-xs">
+                  Send Reminder to Pending
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
 
       {/* Regulatory Frameworks */}
       <div className="space-y-4">

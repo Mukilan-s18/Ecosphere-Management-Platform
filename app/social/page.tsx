@@ -70,11 +70,69 @@ export default function SocialPage() {
       </div>
 
       {isOffline && (
-        <div className="flex items-center gap-2 rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-4 py-2 text-sm text-yellow-400">
+        <div className="flex items-center gap-2 rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-4 py-2 text-sm text-yellow-400 mb-6">
           <AlertCircle className="w-4 h-4 shrink-0" />
           Using demo data — live database temporarily unavailable.
         </div>
       )}
+
+      {/* Workforce & Culture Metrics */}
+      <div className="grid gap-6 md:grid-cols-2 mb-8">
+        <Card className="bg-slate-900/40 border-slate-800 backdrop-blur-sm">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg text-slate-200">Diversity Demographics</CardTitle>
+            <CardDescription>Current workforce distribution</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-slate-400">Gender Ratio (Female to Male)</span>
+                <span className="font-medium text-emerald-400">42% / 58%</span>
+              </div>
+              <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden flex">
+                <div className="h-full bg-emerald-500 w-[42%]"></div>
+                <div className="h-full bg-slate-700 w-[58%]"></div>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-slate-400">Generational Mix (Gen Z & Millennials)</span>
+                <span className="font-medium text-blue-400">68%</span>
+              </div>
+              <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                <div className="h-full bg-blue-500 w-[68%]"></div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-slate-900/40 border-slate-800 backdrop-blur-sm">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg text-slate-200">Compliance & Training</CardTitle>
+            <CardDescription>Mandatory employee course completion</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-slate-400">Anti-Bribery & Corruption</span>
+                <span className="font-medium text-amber-400">94%</span>
+              </div>
+              <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                <div className="h-full bg-amber-500 w-[94%]"></div>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-slate-400">ESG Awareness Program</span>
+                <span className="font-medium text-indigo-400">76%</span>
+              </div>
+              <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                <div className="h-full bg-indigo-500 w-[76%]"></div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {loading ? (
         <div className="flex items-center justify-center py-24">
