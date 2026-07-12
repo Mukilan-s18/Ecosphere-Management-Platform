@@ -83,6 +83,17 @@ export default function GamificationPage() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [joinedChallenges, setJoinedChallenges] = useState<string[]>([]);
+  const [userXp, setUserXp] = useState(2500);
+
+  const handleRedeem = (cost: number, name: string) => {
+    if (userXp >= cost) {
+      setUserXp((prev) => prev - cost);
+      // We don't have toast imported here, let's just use alert or we need to import toast
+      alert(`Successfully redeemed: ${name}!`);
+    } else {
+      alert(`Not enough XP to redeem ${name}. You need ${cost - userXp} more XP.`);
+    }
+  };
   
   useEffect(() => {
     const fetchLeaderboard = async () => {
@@ -273,6 +284,60 @@ export default function GamificationPage() {
               <span className="font-semibold text-slate-300 text-sm leading-tight">{badge.name}</span>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* 4. Rewards Catalog (Bottom) */}
+      <section className="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 shadow-lg backdrop-blur-md mt-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <Award className="w-7 h-7 text-amber-400" />
+            <h2 className="text-2xl font-bold text-white">Reward Catalog</h2>
+          </div>
+          <div className="flex items-center gap-2 bg-slate-950/50 border border-slate-800 px-4 py-2 rounded-xl">
+            <span className="text-slate-400 font-medium">Your Balance:</span>
+            <span className="text-emerald-400 font-bold text-lg">{userXp.toLocaleString()} XP</span>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[
+            { id: 1, name: "$10 Coffee Gift Card", cost: 500, stock: "Available", desc: "Start your day with a sustainable coffee." },
+            { id: 2, name: "Plant a Tree in Your Name", cost: 1000, stock: "Available", desc: "A tree will be planted via OneTreePlanted." },
+            { id: 3, name: "1/2 Day Paid Time Off", cost: 5000, stock: "Limited", desc: "Enjoy a half day off for your green efforts!" },
+          ].map((reward) => {
+            const canAfford = userXp >= reward.cost;
+            
+            return (
+              <Card key={reward.id} className="bg-slate-950/40 border border-slate-800 hover:border-amber-500/30 transition-all">
+                <CardHeader className="pb-3">
+                  <div className="flex justify-between items-start">
+                    <CardTitle className="text-lg text-slate-200">{reward.name}</CardTitle>
+                    <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                      {reward.cost} XP
+                    </span>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm text-slate-400 leading-relaxed">{reward.desc}</p>
+                  <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Status: {reward.stock}</p>
+                </CardContent>
+                <CardFooter>
+                  <button
+                    onClick={() => handleRedeem(reward.cost, reward.name)}
+                    disabled={!canAfford}
+                    className={`w-full py-2.5 rounded-lg font-bold text-sm transition-all duration-300 ${
+                      canAfford
+                        ? "bg-amber-600 hover:bg-amber-500 text-white shadow-lg shadow-amber-900/20"
+                        : "bg-slate-800/50 text-slate-500 cursor-not-allowed"
+                    }`}
+                  >
+                    {canAfford ? "Redeem Reward" : "Not Enough XP"}
+                  </button>
+                </CardFooter>
+              </Card>
+            )
+          })}
         </div>
       </section>
 
