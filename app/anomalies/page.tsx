@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { AlertTriangle, RefreshCw, CheckCircle2, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -78,10 +78,7 @@ const initialDepartments = [
 type Department = typeof initialDepartments[0];
 
 function detectAnomalies(dept: Department) {
-  const spikes = dept.transactions.filter(
-    (t) => t.kg > dept.historicalAvg * 3
-  );
-  return spikes;
+  return dept.transactions.filter((t) => t.kg > dept.historicalAvg * 3);
 }
 
 type Alert = {
@@ -99,15 +96,19 @@ type Alert = {
 export default function AnomaliesPage() {
   const [departments, setDepartments] = useState<Department[]>(initialDepartments);
   const [alerts, setAlerts] = useState<Alert[]>([]);
-  const [scanning, setScanning] = useState(false);
+  const [scanning, setScanning] = useState(true); // Start as scanning on mount
   const [lastScan, setLastScan] = useState<string | null>(null);
-  const [selectedDept, setSelectedDept] = useState<Department>(initialDepartments[0]);
+  const [selectedDeptId, setSelectedDeptId] = useState<string>("eng");
+  
+  const hasMounted = useRef(false);
 
-  const runScan = () => {
+  const selectedDept = departments.find((d) => d.id === selectedDeptId) || departments[0];
+
+  const performScan = useCallback((deptsToScan: Department[]) => {
     setScanning(true);
     setTimeout(() => {
       const found: Alert[] = [];
-      departments.forEach((dept) => {
+      deptsToScan.forEach((dept) => {
         const spikes = detectAnomalies(dept);
         spikes.forEach((spike) => {
           const pct = Math.round((spike.kg / dept.historicalAvg) * 100);
@@ -128,7 +129,9 @@ export default function AnomaliesPage() {
       setLastScan(new Date().toLocaleTimeString());
       setScanning(false);
     }, 1500);
-  };
+  }, []);
+
+  const runScan = () => performScan(departments);
 
   const resolveAlert = (id: string) => {
     setAlerts((prev) =>
@@ -137,36 +140,28 @@ export default function AnomaliesPage() {
   };
 
   const simulateSpike = () => {
-    setDepartments((prev) =>
-      prev.map((dept) => {
-        if (dept.id === "ops") {
-          return {
-            ...dept,
-            transactions: dept.transactions.map((t) =>
-              t.day === "Wed" ? { ...t, kg: 850 } : t
-            ),
-          };
-        }
-        return dept;
-      })
-    );
-    // Automatically switch to Ops and run scan
-    setTimeout(() => {
-      setSelectedDept((prev) => prev.id === "ops" ? prev : { ...prev, id: "fake" }); // Force re-render trick or just let the effect handle it
-      runScan();
-    }, 100);
+    const updatedDepts = departments.map((dept) => {
+      if (dept.id === "ops") {
+        return {
+          ...dept,
+          transactions: dept.transactions.map((t) =>
+            t.day === "Wed" ? { ...t, kg: 850 } : t
+          ),
+        };
+      }
+      return dept;
+    });
+    setDepartments(updatedDepts);
+    setSelectedDeptId("ops");
+    performScan(updatedDepts);
   };
 
   useEffect(() => {
-    const ops = departments.find(d => d.id === "ops");
-    if (ops && selectedDept.id === "ops") {
-      setSelectedDept(ops);
+    if (!hasMounted.current) {
+      hasMounted.current = true;
+      performScan(initialDepartments);
     }
-  }, [departments]);
-
-  useEffect(() => {
-    runScan();
-  }, []);
+  }, [performScan]);
 
   const activeAlerts = alerts.filter((a) => !a.resolved);
   const resolvedAlerts = alerts.filter((a) => a.resolved);
@@ -311,7 +306,7 @@ export default function AnomaliesPage() {
               {departments.map((d) => (
                 <button
                   key={d.id}
-                  onClick={() => setSelectedDept(d)}
+                  onClick={() => setSelectedDeptId(d.id)}
                   className={`text-xs px-3 py-1 rounded-full border transition-colors ${
                     selectedDept.id === d.id
                       ? "bg-orange-600 border-orange-600 text-white"
@@ -350,7 +345,7 @@ export default function AnomaliesPage() {
                     stroke="#f97316"
                     fill="url(#carbonGrad)"
                     strokeWidth={2}
-                    dot={(props) => {
+                    dot={(props: any) => {
                       const { cx, cy, payload } = props;
                       const isSpike = payload.kg > selectedDept.historicalAvg * 3;
                       return (
