@@ -302,27 +302,27 @@ export default function GamificationPage() {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[
-            { id: 1, name: "$10 Coffee Gift Card", cost: 500, stock: "Available", desc: "Start your day with a sustainable coffee." },
+            { id: 1, name: "Rs. 10 Coffee Gift Card", cost: 500, stock: "Available", desc: "Start your day with a sustainable coffee." },
             { id: 2, name: "Plant a Tree in Your Name", cost: 1000, stock: "Available", desc: "A tree will be planted via OneTreePlanted." },
             { id: 3, name: "1/2 Day Paid Time Off", cost: 5000, stock: "Limited", desc: "Enjoy a half day off for your green efforts!" },
           ].map((reward) => {
             const canAfford = userXp >= reward.cost;
             
             return (
-              <Card key={reward.id} className="bg-slate-950/40 border border-slate-800 hover:border-amber-500/30 transition-all">
+              <Card key={reward.id} className="flex flex-col h-full bg-slate-950/40 border border-slate-800 hover:border-amber-500/30 transition-all">
                 <CardHeader className="pb-3">
-                  <div className="flex justify-between items-start">
+                  <div className="flex justify-between items-start gap-2">
                     <CardTitle className="text-lg text-slate-200">{reward.name}</CardTitle>
-                    <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                    <span className="shrink-0 px-2.5 py-1 text-xs font-semibold rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20">
                       {reward.cost} XP
                     </span>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 flex-1">
                   <p className="text-sm text-slate-400 leading-relaxed">{reward.desc}</p>
                   <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Status: {reward.stock}</p>
                 </CardContent>
-                <CardFooter>
+                <CardFooter className="mt-auto">
                   <button
                     onClick={() => handleRedeem(reward.cost, reward.name)}
                     disabled={!canAfford}
