@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
 import {
@@ -63,7 +63,9 @@ const fallbackReportData = {
   },
 }
 
-function ReportModal({ onClose, reportData }: { onClose: () => void, reportData: any }) {
+type ReportData = typeof fallbackReportData;
+
+function ReportModal({ onClose, reportData }: { onClose: () => void, reportData: ReportData }) {
   const handleDownload = (format: string) => {
     if (format === "PDF") {
       window.print()
@@ -232,10 +234,7 @@ function ReportSection({
 }
 
 export default function ReportsBuilder() {
-  const [selectedFormat, setSelectedFormat] = useState("PDF")
-  const [showPreview, setShowPreview] = useState(false)
-  const [reportData, setReportData] = useState(fallbackReportData)
-  const [loading, setLoading] = useState(true)
+  const [reportData, setReportData] = useState<ReportData>(fallbackReportData)
 
   useEffect(() => {
     const loadRealData = async () => {
@@ -244,7 +243,11 @@ export default function ReportsBuilder() {
         const { data: participations, error: err2 } = await supabase.from('participations').select('id, challenges(id, type)');
         
         if (!err2 && participations) {
-          const envChallenges = participations.filter((p: any) => p.challenges?.type === 'environmental').length;
+          const envChallenges = participations.filter((p) => {
+            const ch = p.challenges as unknown as { type: string } | { type: string }[];
+            if (Array.isArray(ch)) return ch.some(c => c.type === 'environmental');
+            return ch?.type === 'environmental';
+          }).length;
           
           setReportData((prev) => ({
             ...prev,
@@ -258,8 +261,6 @@ export default function ReportsBuilder() {
         }
       } catch (e) {
         console.error("Failed to load report data", e);
-      } finally {
-        setLoading(false);
       }
     };
     loadRealData();

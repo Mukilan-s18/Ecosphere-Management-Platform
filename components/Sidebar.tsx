@@ -31,11 +31,14 @@ const routes = [
   { name: "Settings", path: "/settings", icon: Settings },
 ]
 
-export function Sidebar() {
-  const pathname = usePathname()
-  const [mobileOpen, setMobileOpen] = useState(false)
-
-  const NavContent = () => (
+function NavContent({
+  pathname,
+  setMobileOpen,
+}: {
+  pathname: string
+  setMobileOpen: (open: boolean) => void
+}) {
+  return (
     <>
       <div className="p-6 border-b border-slate-800">
         <h1 className="text-2xl font-bold text-green-500 tracking-tight">EcoSphere</h1>
@@ -70,6 +73,11 @@ export function Sidebar() {
       </div>
     </>
   )
+}
+
+export function Sidebar() {
+  const pathname = usePathname()
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
     <>
@@ -96,12 +104,12 @@ export function Sidebar() {
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <NavContent />
+        <NavContent pathname={pathname} setMobileOpen={setMobileOpen} />
       </aside>
 
       {/* Desktop sidebar */}
       <aside className="hidden md:flex w-64 border-r border-slate-800 h-screen fixed left-0 bg-slate-950 flex-col">
-        <NavContent />
+        <NavContent pathname={pathname} setMobileOpen={setMobileOpen} />
       </aside>
     </>
   )
