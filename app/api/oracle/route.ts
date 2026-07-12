@@ -1,8 +1,54 @@
-import { NextRequest, NextResponse } from "next/server";
+/**
+ * app/api/oracle/route.ts
+ * ESG Oracle — Gemini-powered AI policy assistant.
+ *
+ * Security rules applied:
+ * Rule #1  — API key from env only, never exposed to client
+ * Rule #2  — Rate limited: 10 req/min per IP (LLM endpoints)
+ * Rule #3  — Input validated with Zod (query length, prompt injection stripping)
+ * Rule #9  — No stack traces returned to client
+ * Rule #AI — max_tokens enforced, sanitized input, server-side key only
+ */
 
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { llmLimiter, getClientIp } from "@/lib/rate-limit";
+import { serverError, rateLimitError, validationError } from "@/lib/secure-error";
+
+// Rule #1: API key server-side only — never sent to browser
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 const GEMINI_URL =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+
+// Rule #AI: max_tokens enforced
+const MAX_OUTPUT_TOKENS = 512;
+const MAX_HISTORY_MESSAGES = 20; // cap chat history to prevent token abuse
+
+// Rule #3: Zod schema for incoming request body
+const OracleRequestSchema = z.object({
+  messages: z
+    .array(
+      z.object({
+        role: z.enum(["user", "assistant"]),
+        // Rule #AI: strip prompt injection, cap length
+        content: z
+          .string()
+          .min(1)
+          .max(500, "Message too long — max 500 characters")
+          .trim()
+          .transform((val) =>
+            val
+              .replace(/ignore previous instructions/gi, "[removed]")
+              .replace(/system\s*:/gi, "[removed]")
+              .replace(/\[INST\]/gi, "[removed]")
+              .replace(/<\|.*?\|>/g, "[removed]")
+              .replace(/jailbreak/gi, "[removed]")
+          ),
+      })
+    )
+    .min(1, "No messages provided")
+    .max(MAX_HISTORY_MESSAGES, `Chat history too long — max ${MAX_HISTORY_MESSAGES} messages`),
+});
 
 const ESG_SYSTEM_PROMPT = `You are the "ESG Oracle" — an expert AI Policy Assistant for EcoSphere, a corporate ESG (Environmental, Social, and Governance) management platform.
 
@@ -36,64 +82,87 @@ Your role is to answer employee questions about company ESG policies in a clear,
 - Be friendly and professional — you're helping colleagues, not issuing legal warnings.
 - If a policy doesn't exist in your knowledge base, say: "I don't have a specific policy on that. I recommend checking with your HR or Compliance team."
 - Use bullet points for lists.
-- Always end with "💚 Need more help? Ask your HR or Compliance team." if the question seems sensitive or complex.`;
+- Always end with "💚 Need more help? Ask your HR or Compliance team." if the question seems sensitive or complex.
+- IMPORTANT: You are strictly an ESG policy assistant. Refuse any request unrelated to ESG topics.`;
 
 export async function POST(req: NextRequest) {
+  // Rule #2: Rate limit LLM endpoint — 10 req/min per IP
+  const ip = getClientIp(req);
+  const { success, reset } = llmLimiter.check(`oracle:${ip}`);
+  if (!success) {
+    const retryAfter = Math.ceil((reset - Date.now()) / 1000);
+    return rateLimitError(retryAfter);
+  }
+
+  // Rule #1: Fail fast if API key not configured — don't leak the reason
+  if (!GEMINI_API_KEY) {
+    return serverError(new Error("GEMINI_API_KEY not configured"), { route: "/api/oracle" });
+  }
+
+  // Rule #3: Validate and sanitize request body with Zod
+  let body: unknown;
   try {
-    const { messages } = await req.json();
+    body = await req.json();
+  } catch {
+    return validationError("Invalid JSON body");
+  }
 
-    if (!GEMINI_API_KEY) {
-      return NextResponse.json(
-        { error: "GEMINI_API_KEY is not configured." },
-        { status: 500 }
-      );
-    }
+  const parsed = OracleRequestSchema.safeParse(body);
+  if (!parsed.success) {
+    const firstError = parsed.error.issues[0]?.message ?? "Invalid request";
+    return validationError(firstError);
+  }
 
-    // Build Gemini-compatible contents array from chat history
-    const contents = messages.map(
-      (msg: { role: string; content: string }) => ({
-        role: msg.role === "assistant" ? "model" : "user",
-        parts: [{ text: msg.content }],
-      })
-    );
+  const { messages } = parsed.data;
 
-    const body = {
+  try {
+    // Build Gemini-compatible contents array from sanitized chat history
+    const contents = messages.map((msg) => ({
+      role: msg.role === "assistant" ? "model" : "user",
+      parts: [{ text: msg.content }],
+    }));
+
+    const geminiBody = {
       system_instruction: {
         parts: [{ text: ESG_SYSTEM_PROMPT }],
       },
       contents,
       generationConfig: {
         temperature: 0.3,
-        maxOutputTokens: 512,
+        // Rule #AI: max_tokens enforced to prevent runaway costs
+        maxOutputTokens: MAX_OUTPUT_TOKENS,
       },
     };
 
     const response = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      body: JSON.stringify(geminiBody),
     });
 
     if (!response.ok) {
-      const err = await response.text();
-      console.error("Gemini API error:", err);
-      return NextResponse.json(
-        { error: "Failed to get response from AI." },
-        { status: 500 }
-      );
+      // Rule #9: Log internally, return generic error to client
+      const errText = await response.text();
+      return serverError(new Error(`Gemini API error: ${response.status}`), {
+        route: "/api/oracle",
+        status: response.status,
+        // Don't include errText in client response — may contain API details
+      });
     }
 
     const data = await response.json();
-    const text =
+
+    // Rule #AI: Validate LLM output exists before returning
+    const text: string =
       data?.candidates?.[0]?.content?.parts?.[0]?.text ||
       "I couldn't generate a response. Please try again.";
 
+    // Rule #11: text is plain string from Gemini — safe to return as JSON
+    // If ever rendering as HTML, sanitize with DOMPurify first
     return NextResponse.json({ text });
+
   } catch (error) {
-    console.error("Oracle route error:", error);
-    return NextResponse.json(
-      { error: "Internal server error." },
-      { status: 500 }
-    );
+    // Rule #9: Never expose internal error details to client
+    return serverError(error, { route: "/api/oracle", ip });
   }
 }
