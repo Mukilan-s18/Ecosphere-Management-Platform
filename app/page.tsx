@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
@@ -18,6 +19,8 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { supabase } from "@/lib/supabase"
+import { fallbackDashboardStats } from "@/lib/fallback-data"
 
 const stats = [
   {
@@ -121,6 +124,32 @@ function getCategoryVariant(category: string) {
 
 export default function DashboardPage() {
   const router = useRouter()
+  const [liveStats, setLiveStats] = useState(fallbackDashboardStats)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchDashboardStats = async () => {
+      try {
+        const { data: users, error: err1 } = await supabase.from('users').select('id')
+        const { data: participations, error: err2 } = await supabase.from('participations').select('id').eq('status', 'approved')
+        
+        if (!err1 && users) {
+          setLiveStats((prev) => ({ ...prev, activeParticipants: users.length }))
+        }
+        if (!err2 && participations) {
+           // mock offset calculation based on participations
+           const offset = 12.4 + (participations.length * 0.5)
+           setLiveStats((prev) => ({ ...prev, carbonOffset: `${offset.toFixed(1)} tCO₂e` }))
+        }
+      } catch (e) {
+        console.error("Failed to load live stats")
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchDashboardStats()
+  }, [])
+
   return (
     <div className="space-y-8">
       {/* Hero Header */}
@@ -148,29 +177,54 @@ export default function DashboardPage() {
 
       {/* Stats Grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => {
-          const Icon = stat.icon
-          return (
-            <Card key={stat.label}>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardDescription className="text-sm font-medium">{stat.label}</CardDescription>
-                <Icon className="size-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <div className="flex items-center gap-1 mt-1">
-                  <TrendingUp className="size-3 text-emerald-500" />
-                  <span className="text-xs text-emerald-500 font-medium">
-                    {stat.change}
-                  </span>
-                  <span className="text-xs text-muted-foreground ml-1">
-                    {stat.description}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-          )
-        })}
+        <Card className="border-slate-800 bg-slate-900/50">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Carbon Offset</CardTitle>
+            <Leaf className="size-4 text-green-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">{liveStats.carbonOffset}</div>
+            <p className="text-xs text-muted-foreground mt-1 text-green-400">
+              +18.2% This quarter vs. last
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="border-slate-800 bg-slate-900/50">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Active Participants</CardTitle>
+            <Users className="size-4 text-blue-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">{liveStats.activeParticipants}</div>
+            <p className="text-xs text-muted-foreground mt-1 text-blue-400">
+              +12.5% Across all departments
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="border-slate-800 bg-slate-900/50">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Compliance Score</CardTitle>
+            <ShieldAlert className="size-4 text-amber-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">{liveStats.complianceScore}%</div>
+            <p className="text-xs text-muted-foreground mt-1 text-amber-400">
+              Stable Governance alignment
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="border-slate-800 bg-slate-900/50">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Total Emissions</CardTitle>
+            <TrendingUp className="size-4 text-red-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">{liveStats.totalEmissions}</div>
+            <p className="text-xs text-muted-foreground mt-1 text-red-400">
+              -12.0% Year over year
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Main Grid */}
