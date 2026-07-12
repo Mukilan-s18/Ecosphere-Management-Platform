@@ -1,49 +1,29 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
-import { Navbar } from "@/components/navbar";
-import { Toaster } from "@/components/ui/sonner";
+import "./globals.css"
+import { Inter } from "next/font/google"
+import { Sidebar } from "@/components/Sidebar"
+import { Toaster } from "sonner"
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"] })
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-  title: "Ecosphere — ESG Management Platform",
-  description:
-    "Enterprise sustainability gamification, governance compliance, and ESG performance management platform.",
-};
+export const metadata = {
+  title: "EcoSphere Management Platform",
+  description: "Global layouts, charts, and reporting",
+}
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-      suppressHydrationWarning
-    >
-      <body className="min-h-full flex flex-col bg-background text-foreground">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Toaster richColors position="bottom-right" />
-        </ThemeProvider>
+    <html lang="en" className="dark">
+      <body className={`${inter.className} bg-slate-950 text-white flex`}>
+        <Sidebar />
+        <main className="flex-1 ml-64 p-8">
+          {children}
+        </main>
+        <Toaster theme="dark" />
       </body>
     </html>
-  );
+  )
 }

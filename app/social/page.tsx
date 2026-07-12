@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 // Assuming M1 will provide these in lib/supabase. 
 // import { uploadProof, insertParticipation } from "@/lib/supabase";
 
@@ -40,7 +40,6 @@ function ChallengeCard({ challenge }: { challenge: { id: string; title: string; 
   const [joined, setJoined] = useState(false);
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
-  const { toast } = useToast();
 
   const handleJoin = () => {
     setJoined(true);
@@ -56,18 +55,14 @@ function ChallengeCard({ challenge }: { challenge: { id: string; title: string; 
       const url = await uploadProof(file);
       await insertParticipation(mockUserId, challenge.id, url);
       
-      toast({
-        title: "Evidence submitted for review!",
+      toast(`Evidence submitted for review!`, {
         description: `Your proof for "${challenge.title}" has been uploaded.`,
       });
       
       setJoined(false);
       setFile(null);
     } catch (error) {
-      toast({
-        title: "Error submitting evidence",
-        variant: "destructive",
-      });
+      toast.error("Error submitting evidence");
     } finally {
       setLoading(false);
     }
