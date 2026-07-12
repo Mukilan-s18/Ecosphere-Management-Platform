@@ -1,4 +1,7 @@
+"use client"
+
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import {
   LayoutDashboard,
   Leaf,
@@ -7,6 +10,9 @@ import {
   Settings,
   ClipboardCheck,
   Shield,
+  Award,
+  Sparkles,
+  AlertTriangle,
 } from "lucide-react"
 
 export function Sidebar() {
@@ -17,8 +23,13 @@ export function Sidebar() {
     { name: "Manager Review", path: "/manager", icon: ClipboardCheck },
     { name: "Governance", path: "/governance", icon: Shield },
     { name: "Reports", path: "/reports", icon: FileText },
+    { name: "Gamification", path: "/gamification", icon: Award },
+    { name: "EcoSphere Wrapped", path: "/wrapped", icon: Sparkles },
+    { name: "Anomaly Detection", path: "/anomalies", icon: AlertTriangle },
     { name: "Settings", path: "/settings", icon: Settings },
   ]
+
+  const pathname = usePathname()
 
   return (
     <aside className="w-64 border-r border-slate-800 h-screen fixed left-0 bg-slate-950 flex flex-col">
@@ -32,7 +43,11 @@ export function Sidebar() {
             <Link
               key={route.name}
               href={route.path}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+                pathname === route.path
+                  ? "bg-primary/10 text-primary font-semibold"
+                  : "text-slate-300 hover:text-white hover:bg-slate-800"
+              }`}
             >
               <Icon className="w-5 h-5" />
               {route.name}

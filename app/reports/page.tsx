@@ -65,6 +65,10 @@ const reportData = {
 
 function ReportModal({ onClose }: { onClose: () => void }) {
   const handleDownload = (format: string) => {
+    if (format === "PDF") {
+      window.print()
+      return
+    }
     toast(`Generating ${format} Report`, {
       description: `Your GRI/SASB Investor-Ready ${format} report is being compiled.`,
     })
@@ -227,6 +231,10 @@ export default function ReportsBuilder() {
   const [showModal, setShowModal] = useState(false)
 
   const handleExport = (format: string) => {
+    if (format === "PDF") {
+      window.print()
+      return
+    }
     toast(`Report generation started`, {
       description: `Your ${format} report is being prepared.`,
     })

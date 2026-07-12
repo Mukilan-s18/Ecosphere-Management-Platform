@@ -62,6 +62,13 @@ export default function GamificationPage() {
     }
   };
 
+  const getEcoAvatar = (xp: number) => {
+    if (xp < 200) return { emoji: "🌱", label: "Seedling" };
+    if (xp < 500) return { emoji: "🌿", label: "Sprout" };
+    if (xp < 900) return { emoji: "🌳", label: "Young Tree" };
+    return { emoji: "🎋", label: "Bamboo Champion" };
+  };
+
   return (
     <div className="p-8 space-y-12 animate-in fade-in duration-500">
       
@@ -78,16 +85,22 @@ export default function GamificationPage() {
               <TableRow className="bg-muted/50 hover:bg-muted/50">
                 <TableHead className="w-[100px] text-center">Rank</TableHead>
                 <TableHead>Employee</TableHead>
+                <TableHead className="text-center w-[100px]">Eco Level</TableHead>
                 <TableHead className="text-right">Total XP</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
-                <TableRow>
-                  <TableCell colSpan={3} className="text-center py-8 text-muted-foreground">
-                    Loading leaderboard data...
-                  </TableCell>
-                </TableRow>
+                <>
+                  {[...Array(5)].map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell><div className="h-5 w-8 mx-auto rounded bg-muted animate-pulse" /></TableCell>
+                      <TableCell><div className="h-5 w-40 rounded bg-muted animate-pulse" /></TableCell>
+                      <TableCell><div className="h-8 w-8 mx-auto rounded-full bg-muted animate-pulse" /></TableCell>
+                      <TableCell><div className="h-5 w-20 ml-auto rounded bg-muted animate-pulse" /></TableCell>
+                    </TableRow>
+                  ))}
+                </>
               ) : (
                 leaderboard.map((row, index) => (
                   <TableRow key={index} className="hover:bg-muted/30 transition-colors">
@@ -98,6 +111,10 @@ export default function GamificationPage() {
                       </div>
                     </TableCell>
                     <TableCell className="font-semibold">{row.employee}</TableCell>
+                    <TableCell className="text-center">
+                      <span className="text-2xl" title={getEcoAvatar(row.xp).label}>{getEcoAvatar(row.xp).emoji}</span>
+                      <div className="text-[10px] text-muted-foreground">{getEcoAvatar(row.xp).label}</div>
+                    </TableCell>
                     <TableCell className="text-right font-bold text-green-500">{row.xp} XP</TableCell>
                   </TableRow>
                 ))
