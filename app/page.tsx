@@ -282,6 +282,33 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
+          {/* Department Face-Off (Tug-of-War) */}
+          <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex justify-between items-center text-lg">
+                <span>Department Face-Off</span>
+                <span className="text-xs font-normal text-muted-foreground bg-background px-2 py-1 rounded-full animate-pulse border">Live 🔥</span>
+              </CardTitle>
+              <CardDescription>IT Services vs Office Operations</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex h-10 rounded-full overflow-hidden border border-border shadow-inner">
+                <div
+                  style={{ width: `${(95 / (95 + 92)) * 100}%` }}
+                  className="bg-emerald-500 flex items-center justify-end pr-3 text-xs font-bold text-white transition-all duration-1000"
+                >
+                  IT (95)
+                </div>
+                <div
+                  style={{ width: `${(92 / (95 + 92)) * 100}%` }}
+                  className="bg-blue-500 flex items-center pl-3 text-xs font-bold text-white transition-all duration-1000"
+                >
+                  Office (92)
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Sustainability Leaderboard */}
           <Card>
             <CardHeader>
