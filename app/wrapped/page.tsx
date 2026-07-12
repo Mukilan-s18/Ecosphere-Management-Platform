@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Sparkles, TreePine, Car, Zap, Droplets, Share2, Download, ChevronRight } from "lucide-react";
+import { Sparkles, TreePine, Car, Zap, Droplets, Share2, Download, ChevronRight, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
 
 const fallbackQuarterData = {
   quarter: "Q2 2026",
@@ -76,6 +78,7 @@ export default function WrappedPage() {
   const [animating, setAnimating] = useState(false);
   const [quarterData, setQuarterData] = useState(fallbackQuarterData);
   const [loading, setLoading] = useState(true);
+  const slideRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loadRealData = async () => {
@@ -120,25 +123,44 @@ export default function WrappedPage() {
     }, 300);
   };
 
+  const prev = () => {
+    if (currentSlide > 0) goTo(currentSlide - 1);
+  };
+
   const next = () => {
     if (currentSlide < slides.length - 1) goTo(currentSlide + 1);
   };
 
-  const handleShare = () => {
+  const handleShare = async () => {
     const url = typeof window !== 'undefined' ? window.location.href : '';
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'EcoSphere Wrapped', text: 'Check out my sustainability impact!', url });
+        return;
+      } catch (e) {
+        // Fallback
+      }
+    }
     if (navigator.clipboard) {
       navigator.clipboard.writeText(url);
     }
-    toast.success("Link copied to clipboard!", {
-      description: "Share your quarterly impact summary with your team.",
-    });
+    toast.success("Link copied to clipboard!", { description: "Share your quarterly impact summary with your team." });
   };
 
-  const handleDownload = () => {
-    toast.success("Generating PDF report...", {
-      description: "Your EcoSphere Wrapped PDF will be ready shortly.",
-    });
-    setTimeout(() => window.print(), 500);
+  const handleDownload = async () => {
+    if (!slideRef.current) return;
+    toast.info("Generating PDF report...", { description: "Your EcoSphere Wrapped PDF will be ready shortly." });
+    try {
+      const canvas = await html2canvas(slideRef.current, { scale: 2, backgroundColor: '#020617' });
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [canvas.width, canvas.height] });
+      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+      pdf.save('EcoSphere-Wrapped-Q2-2026.pdf');
+      toast.success("Download complete!");
+    } catch (e) {
+      toast.error("Failed to generate PDF");
+      setTimeout(() => window.print(), 500); // Fallback
+    }
   };
 
   return (
@@ -176,6 +198,7 @@ export default function WrappedPage() {
 
       {/* Slide Container */}
       <div
+        ref={slideRef}
         className={`relative rounded-2xl bg-gradient-to-br ${gradients[currentSlide]} border border-slate-800 overflow-hidden min-h-[480px] flex flex-col items-center justify-center transition-opacity duration-300 ${animating ? "opacity-0" : "opacity-100"} print:bg-none print:border-none print:min-h-0 print:block`}
       >
         {/* Decorative blobs */}
@@ -328,6 +351,16 @@ export default function WrappedPage() {
           )}
         </div>
 
+        {/* Previous button */}
+        {currentSlide > 0 && (
+          <button
+            onClick={prev}
+            className="absolute left-6 bottom-6 p-3 rounded-full bg-slate-800 hover:bg-slate-700 text-white transition-all hover:scale-110 z-20"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+        )}
+        
         {/* Next button */}
         {currentSlide < slides.length - 1 && (
           <button
