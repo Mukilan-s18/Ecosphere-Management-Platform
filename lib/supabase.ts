@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Access environment variables for Supabase connection
-const supabaseUrl = process.env.SUPABASE_URL || 'YOUR_SUPABASE_URL';
-const supabaseKey = process.env.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://bjxpkirduvohiljrvwyu.supabase.co';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_YEaOW8ARPYaNrLBadbrzUw_cLOsnZaR';
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -18,7 +18,7 @@ export const getChallenges = async () => {
  */
 export const uploadProof = async (file: File) => {
   const fileName = `${Date.now()}_${file.name}`;
-  
+
   const { data, error } = await supabase.storage
     .from('proofs')
     .upload(fileName, file);
