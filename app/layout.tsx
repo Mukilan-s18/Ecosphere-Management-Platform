@@ -1,13 +1,14 @@
 import "./globals.css"
 import { Inter } from "next/font/google"
 import { Sidebar } from "@/components/Sidebar"
+import { ESGOracle } from "@/components/ESGOracle"
 import { Toaster } from "sonner"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
   title: "EcoSphere Management Platform",
-  description: "Global layouts, charts, and reporting",
+  description: "ESG Management Platform with AI-powered policy assistant",
 }
 
 export default function RootLayout({
@@ -22,6 +23,7 @@ export default function RootLayout({
         <main className="flex-1 ml-64 p-8">
           {children}
         </main>
+        <ESGOracle />
         <Toaster theme="dark" />
       </body>
     </html>
