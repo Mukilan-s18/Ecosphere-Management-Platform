@@ -1,0 +1,28 @@
+{
+  "name": "ecosphere-management-platform",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mukilan-s18/Ecosphere-Management-Platform.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Mukilan-s18/Ecosphere-Management-Platform/issues"
+  },
+  "homepage": "https://github.com/Mukilan-s18/Ecosphere-Management-Platform#readme",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.110.2"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "typescript": "^7.0.2"
+  }
+}
