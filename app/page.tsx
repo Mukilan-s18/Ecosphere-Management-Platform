@@ -165,16 +165,20 @@ export default function DashboardPage() {
             </p>
           </div>
         </div>
-        <Tabs defaultValue="dashboard" className="w-[300px]" onValueChange={(val) => {
-          if (val === "analytics") router.push('/reports')
-        }}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="dashboard">Overview</TabsTrigger>
-            <TabsTrigger value="analytics">
-              Reports
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <div className="flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground w-[300px]">
+          <Link
+            href="/"
+            className="inline-flex flex-1 items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all bg-background text-foreground shadow-sm"
+          >
+            Overview
+          </Link>
+          <Link
+            href="/reports"
+            className="inline-flex flex-1 items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all hover:bg-background/50 hover:text-foreground"
+          >
+            Reports
+          </Link>
+        </div>
       </div>
 
       {/* Stats Grid */}

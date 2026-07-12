@@ -119,8 +119,11 @@ export function ESGOracle() {
       {/* Floating Toggle Button */}
       <button
         id="esg-oracle-toggle"
-        onClick={() => setIsOpen((prev) => !prev)}
-        className={`fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full px-4 py-3 font-semibold text-sm shadow-2xl transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${
+        onPointerDown={(e) => {
+          e.preventDefault();
+          setIsOpen((prev) => !prev);
+        }}
+        className={`fixed bottom-6 right-6 z-[9999] flex items-center gap-2 rounded-full px-4 py-3 font-semibold text-sm shadow-2xl transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${
           isOpen
             ? "bg-slate-700 text-white hover:bg-slate-600"
             : "bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-400 hover:to-teal-400 hover:scale-105 hover:shadow-emerald-500/30"
@@ -142,7 +145,7 @@ export function ESGOracle() {
 
       {/* Chat Panel */}
       <div
-        className={`fixed bottom-20 right-6 z-50 flex flex-col rounded-2xl border border-slate-700/60 bg-slate-900 shadow-2xl shadow-black/50 transition-all duration-300 ${
+        className={`fixed bottom-20 right-6 z-[9998] flex flex-col rounded-2xl border border-slate-700/60 bg-slate-900 shadow-2xl shadow-black/50 transition-all duration-300 ${
           isOpen
             ? "w-[380px] h-[560px] opacity-100 translate-y-0 pointer-events-auto"
             : "w-[380px] h-[560px] opacity-0 translate-y-4 pointer-events-none"
