@@ -33,11 +33,12 @@ export const fallbackChallenges = [
 ];
 
 export const fallbackLeaderboard = [
-  { employee: "Aditi Rao", xp: 1200 },
-  { employee: "Karan Shah", xp: 980 },
-  { employee: "Priya Menon", xp: 860 },
-  { employee: "Rahul Kumar", xp: 750 },
-  { employee: "Sneha Iyer", xp: 640 },
+  { employee: "Manufacturing Dept", xp: 4500 },
+  { employee: "Aditi Rao", xp: 3500 },
+  { employee: "Corporate Dept", xp: 2500 },
+  { employee: "Karan Shah", xp: 2100 },
+  { employee: "Logistics Team", xp: 1850 },
+  { employee: "Priya Menon", xp: 1600 },
 ];
 
 export const fallbackDashboardStats = {
