@@ -5,19 +5,21 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trophy, Medal, Award } from "lucide-react"; // Assuming M4 installed lucide-react
 
-// Mock getLeaderboard until M1 is ready
+import { supabase } from "@/lib/supabase";
+
 const getLeaderboard = async () => {
-  return new Promise<any[]>((resolve) => 
-    setTimeout(() => 
-      resolve([
-        { rank: 1, employee: "Aditi Rao", xp: 1200 },
-        { rank: 2, employee: "Karan Shah", xp: 950 },
-        { rank: 3, employee: "Mukesh Kumar", xp: 800 },
-        { rank: 4, employee: "Fadil", xp: 650 },
-        { rank: 5, employee: "Muthesh", xp: 400 },
-      ])
-    , 500)
-  );
+  const { data, error } = await supabase
+    .from('users')
+    .select('name, xp')
+    .order('xp', { ascending: false })
+    .limit(10);
+    
+  if (error) throw error;
+  
+  return data.map((user) => ({
+    employee: user.name,
+    xp: user.xp,
+  }));
 };
 
 const badges = [
