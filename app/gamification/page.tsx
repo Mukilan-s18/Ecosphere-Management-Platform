@@ -302,7 +302,7 @@ export default function GamificationPage() {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[
-            { id: 1, name: "Rs. 10 Coffee Gift Card", cost: 500, stock: "Available", desc: "Start your day with a sustainable coffee." },
+            { id: 1, name: "Rs. 1000 Amazon Gift Card", cost: 500, stock: "Available" },
             { id: 2, name: "Plant a Tree in Your Name", cost: 1000, stock: "Available", desc: "A tree will be planted via OneTreePlanted." },
             { id: 3, name: "1/2 Day Paid Time Off", cost: 5000, stock: "Limited", desc: "Enjoy a half day off for your green efforts!" },
           ].map((reward) => {
