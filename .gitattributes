@@ -1,0 +1,4 @@
+# Ignore config and scripts from GitHub language statistics
+*.js linguist-detectable=false
+*.mjs linguist-detectable=false
+*.css linguist-detectable=false
