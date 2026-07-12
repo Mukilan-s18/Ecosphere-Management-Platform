@@ -31,8 +31,13 @@ const badges = [
   { id: 6, name: "🔌 Energy Star", description: "Powered down workstation consistently after hours." },
 ];
 
+interface LeaderboardEntry {
+  employee: string;
+  xp: number;
+}
+
 export default function GamificationPage() {
-  const [leaderboard, setLeaderboard] = useState<any[]>([]);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [isOffline, setIsOffline] = useState(false);
   
@@ -79,6 +84,13 @@ export default function GamificationPage() {
           <Trophy className="w-8 h-8 text-yellow-500" />
           <h1 className="text-3xl font-bold">Company Leaderboard</h1>
         </div>
+        
+        {isOffline && (
+          <div className="mb-4 flex items-center gap-2 rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-4 py-2 text-sm text-yellow-400">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            Using demo data — live database temporarily unavailable.
+          </div>
+        )}
         
         <div className="rounded-md border bg-card text-card-foreground shadow-sm">
           <Table>

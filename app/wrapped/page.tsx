@@ -84,13 +84,17 @@ export default function WrappedPage() {
         const { data: users, error: err1 } = await supabase.from('users').select('id, name, total_xp').order('total_xp', { ascending: false }).limit(1);
         const { data: participations, error: err2 } = await supabase.from('participations').select('id, challenges(id, type)');
         
-        const updates: any = {};
+        const updates: Record<string, number | string> = {};
         if (!err1 && users?.length > 0) {
           updates.topEmployee = users[0].name;
           updates.topEmployeeXP = users[0].total_xp || 1200;
         }
         if (!err2 && participations) {
-          const envChallenges = participations.filter((p: any) => p.challenges?.type === 'environmental').length;
+          const envChallenges = participations.filter((p) => {
+            const ch = p.challenges as unknown as { type: string } | { type: string }[];
+            if (Array.isArray(ch)) return ch.some(c => c.type === 'environmental');
+            return ch?.type === 'environmental';
+          }).length;
           updates.activeChallenges = participations.length;
           updates.co2Saved = 5000 + (envChallenges * 150);
           updates.carEquivalent = Math.round(updates.co2Saved / 330);
@@ -207,7 +211,7 @@ export default function WrappedPage() {
               <p className="text-2xl font-bold text-white">of CO₂</p>
               <div className="w-24 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 mx-auto rounded-full" />
               <p className="text-slate-400 text-sm max-w-sm mx-auto">
-                That's a {quarterData.trend} improvement from last quarter. Your team is accelerating! 🚀
+                That&apos;s a {quarterData.trend} improvement from last quarter. Your team is accelerating! 🚀
               </p>
             </div>
           )}
