@@ -41,6 +41,11 @@ export function ESGOracle() {
 
   const sendMessage = async (text: string) => {
     if (!text.trim() || isLoading) return;
+    if (text.length > 500) {
+      // Prevent massive prompts that could crash the UI or API
+      alert("Please keep your message under 500 characters.");
+      return;
+    }
 
     const userMessage: Message = { role: "user", content: text };
     const newMessages = [...messages, userMessage];
@@ -233,30 +238,36 @@ export function ESGOracle() {
 
         {/* Input */}
         <div className="border-t border-slate-700/60 p-3">
-          <form onSubmit={handleSubmit} className="flex items-center gap-2">
-            <input
-              ref={inputRef}
-              id="esg-oracle-input"
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about any ESG policy..."
-              disabled={isLoading}
-              className="flex-1 rounded-xl border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white placeholder-slate-500 outline-none transition focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/30 disabled:opacity-60"
-            />
-            <button
-              id="esg-oracle-send"
-              type="submit"
-              disabled={!input.trim() || isLoading}
-              className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-md transition hover:from-emerald-400 hover:to-teal-400 disabled:opacity-40 disabled:cursor-not-allowed"
-              aria-label="Send message"
-            >
-              {isLoading ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
-                <Send className="size-4" />
-              )}
-            </button>
+          <form onSubmit={handleSubmit} className="relative">
+            <div className="relative">
+              <input
+                ref={inputRef}
+                type="text"
+                placeholder="Ask a compliance question..."
+                value={input}
+                maxLength={500}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage(input);
+                  }
+                }}
+                className="w-full bg-slate-800/50 border border-slate-700 rounded-xl pl-4 pr-24 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-green-500/50 transition-shadow placeholder:text-slate-500"
+              />
+              <div className="absolute right-2 top-2 flex items-center gap-2">
+                <span className="text-[10px] text-slate-500">
+                  {input.length}/500
+                </span>
+                <button
+                  type="submit"
+                  disabled={!input.trim() || isLoading}
+                  className="bg-green-600 hover:bg-green-500 disabled:bg-slate-700 disabled:text-slate-500 text-white p-1.5 rounded-lg transition-colors flex items-center justify-center"
+                >
+                  <Send className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
           </form>
           <p className="mt-1.5 text-center text-[10px] text-slate-600">
             Powered by Gemini AI · Policies updated Q3 2026

@@ -16,7 +16,7 @@ import {
 } from "recharts";
 
 // Mock carbon transaction data per department
-const departments = [
+const initialDepartments = [
   {
     id: "eng",
     name: "Engineering",
@@ -75,7 +75,9 @@ const departments = [
   },
 ];
 
-function detectAnomalies(dept: (typeof departments)[0]) {
+type Department = typeof initialDepartments[0];
+
+function detectAnomalies(dept: Department) {
   const spikes = dept.transactions.filter(
     (t) => t.kg > dept.historicalAvg * 3
   );
@@ -95,10 +97,11 @@ type Alert = {
 };
 
 export default function AnomaliesPage() {
+  const [departments, setDepartments] = useState<Department[]>(initialDepartments);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [scanning, setScanning] = useState(false);
   const [lastScan, setLastScan] = useState<string | null>(null);
-  const [selectedDept, setSelectedDept] = useState(departments[0]);
+  const [selectedDept, setSelectedDept] = useState<Department>(initialDepartments[0]);
 
   const runScan = () => {
     setScanning(true);
@@ -133,6 +136,34 @@ export default function AnomaliesPage() {
     );
   };
 
+  const simulateSpike = () => {
+    setDepartments((prev) =>
+      prev.map((dept) => {
+        if (dept.id === "ops") {
+          return {
+            ...dept,
+            transactions: dept.transactions.map((t) =>
+              t.day === "Wed" ? { ...t, kg: 850 } : t
+            ),
+          };
+        }
+        return dept;
+      })
+    );
+    // Automatically switch to Ops and run scan
+    setTimeout(() => {
+      setSelectedDept((prev) => prev.id === "ops" ? prev : { ...prev, id: "fake" }); // Force re-render trick or just let the effect handle it
+      runScan();
+    }, 100);
+  };
+
+  useEffect(() => {
+    const ops = departments.find(d => d.id === "ops");
+    if (ops && selectedDept.id === "ops") {
+      setSelectedDept(ops);
+    }
+  }, [departments]);
+
   useEffect(() => {
     runScan();
   }, []);
@@ -157,6 +188,14 @@ export default function AnomaliesPage() {
           {lastScan && (
             <span className="text-xs text-slate-500">Last scan: {lastScan}</span>
           )}
+          <Button
+            onClick={simulateSpike}
+            disabled={scanning}
+            variant="outline"
+            className="border-red-500/50 text-red-500 hover:bg-red-500/10"
+          >
+            Simulate Spike
+          </Button>
           <Button
             onClick={runScan}
             disabled={scanning}

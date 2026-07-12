@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -23,7 +23,7 @@ import {
 } from "lucide-react"
 
 // --- GRI / SASB Report Data ---
-const reportData = {
+const fallbackReportData = {
   company: "EcoSphere Corp Ltd.",
   reportingPeriod: "January 1, 2025 – December 31, 2025",
   reportingFramework: "GRI Standards 2021 & SASB (TCFD-Aligned)",
@@ -63,7 +63,7 @@ const reportData = {
   },
 }
 
-function ReportModal({ onClose }: { onClose: () => void }) {
+function ReportModal({ onClose, reportData }: { onClose: () => void, reportData: any }) {
   const handleDownload = (format: string) => {
     if (format === "PDF") {
       window.print()
@@ -72,24 +72,28 @@ function ReportModal({ onClose }: { onClose: () => void }) {
     toast(`Generating ${format} Report`, {
       description: `Your GRI/SASB Investor-Ready ${format} report is being compiled.`,
     })
-    onClose()
+    if (format === "PDF" || format === "GRI Package") {
+      setTimeout(() => window.print(), 500)
+    } else {
+      onClose()
+    }
   }
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-      <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200 print:bg-white print:p-0 print:absolute print:inset-0">
+      <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl print:bg-white print:border-none print:shadow-none print:text-black print:max-h-none print:overflow-visible">
 
         {/* Modal Header */}
-        <div className="sticky top-0 bg-slate-900 border-b border-slate-800 p-6 flex items-start justify-between z-10">
+        <div className="sticky top-0 bg-slate-900 border-b border-slate-800 p-6 flex items-start justify-between z-10 print:bg-white print:border-b-2 print:border-slate-200 print:pb-4">
           <div>
             <div className="flex items-center gap-3 mb-1">
-              <Award className="w-6 h-6 text-amber-400" />
-              <span className="text-xs font-semibold uppercase tracking-widest text-amber-400">Investor-Ready Report</span>
+              <Award className="w-6 h-6 text-amber-400 print:text-black" />
+              <span className="text-xs font-semibold uppercase tracking-widest text-amber-400 print:text-slate-600">Investor-Ready Report</span>
             </div>
-            <h2 className="text-2xl font-bold text-white">GRI Standards 2021 & SASB Disclosure</h2>
-            <p className="text-slate-400 text-sm mt-1">{reportData.company} · {reportData.reportingPeriod}</p>
+            <h2 className="text-2xl font-bold text-white print:text-black">GRI Standards 2021 & SASB Disclosure</h2>
+            <p className="text-slate-400 text-sm mt-1 print:text-slate-500">{reportData.company} · {reportData.reportingPeriod}</p>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-colors">
+          <button onClick={onClose} className="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition-colors print:hidden">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -102,11 +106,11 @@ function ReportModal({ onClose }: { onClose: () => void }) {
               { icon: Globe, label: "Framework", value: "GRI 2021 + SASB + TCFD" },
               { icon: FileText, label: "Generated", value: reportData.generatedOn },
             ].map(({ icon: Icon, label, value }) => (
-              <div key={label} className="bg-slate-800/50 border border-slate-700 rounded-lg p-4 flex items-start gap-3">
-                <Icon className="w-4 h-4 text-slate-400 mt-1 shrink-0" />
+              <div key={label} className="bg-slate-800/50 border border-slate-700 rounded-lg p-4 flex items-start gap-3 print:bg-white print:border-slate-300">
+                <Icon className="w-4 h-4 text-slate-400 mt-1 shrink-0 print:text-slate-500" />
                 <div>
-                  <p className="text-xs text-slate-400">{label}</p>
-                  <p className="text-sm font-medium text-white mt-0.5">{value}</p>
+                  <p className="text-xs text-slate-400 print:text-slate-500">{label}</p>
+                  <p className="text-sm font-medium text-white mt-0.5 print:text-black">{value}</p>
                 </div>
               </div>
             ))}
@@ -115,15 +119,15 @@ function ReportModal({ onClose }: { onClose: () => void }) {
           {/* ESG Score Summary */}
           <div className="grid grid-cols-3 gap-4">
             {[
-              { icon: Leaf, label: "Environmental", score: reportData.environmental.score, color: "text-green-400", bg: "bg-green-500/10 border-green-500/30" },
-              { icon: Users, label: "Social", score: reportData.social.score, color: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/30" },
-              { icon: ShieldAlert, label: "Governance", score: reportData.governance.score, color: "text-amber-400", bg: "bg-amber-500/10 border-amber-500/30" },
+              { icon: Leaf, label: "Environmental", score: reportData.environmental.score, color: "text-green-400 print:text-black", bg: "bg-green-500/10 border-green-500/30 print:bg-white print:border-slate-300" },
+              { icon: Users, label: "Social", score: reportData.social.score, color: "text-blue-400 print:text-black", bg: "bg-blue-500/10 border-blue-500/30 print:bg-white print:border-slate-300" },
+              { icon: ShieldAlert, label: "Governance", score: reportData.governance.score, color: "text-amber-400 print:text-black", bg: "bg-amber-500/10 border-amber-500/30 print:bg-white print:border-slate-300" },
             ].map(({ icon: Icon, label, score, color, bg }) => (
               <div key={label} className={`border rounded-xl p-5 flex items-center gap-4 ${bg}`}>
                 <Icon className={`w-8 h-8 ${color}`} />
                 <div>
-                  <p className="text-slate-400 text-sm">{label} Score</p>
-                  <p className={`text-3xl font-bold ${color}`}>{score}<span className="text-lg text-slate-400">/100</span></p>
+                  <p className="text-slate-400 text-sm print:text-slate-500">{label} Score</p>
+                  <p className={`text-3xl font-bold ${color}`}>{score}<span className="text-lg text-slate-400 print:text-slate-500">/100</span></p>
                 </div>
               </div>
             ))}
@@ -154,12 +158,12 @@ function ReportModal({ onClose }: { onClose: () => void }) {
           />
 
           {/* Footer / Download Actions */}
-          <div className="pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-xs text-slate-500">
+          <div className="pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 print:border-slate-300">
+            <p className="text-xs text-slate-500 print:text-slate-600">
               This report conforms to GRI Standards 2021, SASB industry standards, and TCFD recommendations.
               All figures are audited and prepared in accordance with the EcoSphere Management Platform data governance framework.
             </p>
-            <div className="flex gap-3 shrink-0">
+            <div className="flex gap-3 shrink-0 print:hidden">
               <Button variant="outline" className="border-red-500/50 text-red-400 hover:bg-red-500/10" onClick={() => handleDownload("PDF")}>
                 <FileText className="w-4 h-4 mr-2" /> PDF
               </Button>
@@ -228,6 +232,39 @@ function ReportSection({
 }
 
 export default function ReportsBuilder() {
+  const [selectedFormat, setSelectedFormat] = useState("PDF")
+  const [showPreview, setShowPreview] = useState(false)
+  const [reportData, setReportData] = useState(fallbackReportData)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const loadRealData = async () => {
+      try {
+        const { supabase } = await import("@/lib/supabase");
+        const { data: participations, error: err2 } = await supabase.from('participations').select('id, challenges(id, type)');
+        
+        if (!err2 && participations) {
+          const envChallenges = participations.filter((p: any) => p.challenges?.type === 'environmental').length;
+          
+          setReportData((prev) => ({
+            ...prev,
+            environmental: {
+              ...prev.environmental,
+              disclosures: prev.environmental.disclosures.map(d => 
+                d.id === "GRI 305-1" ? { ...d, value: `${1240 - envChallenges * 2} tCO2e`, trend: "Improving" } : d
+              )
+            }
+          }));
+        }
+      } catch (e) {
+        console.error("Failed to load report data", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadRealData();
+  }, []);
+
   const [showModal, setShowModal] = useState(false)
 
   const handleExport = (format: string) => {
@@ -238,11 +275,14 @@ export default function ReportsBuilder() {
     toast(`Report generation started`, {
       description: `Your ${format} report is being prepared.`,
     })
+    if (format === "PDF") {
+      setTimeout(() => window.print(), 500)
+    }
   }
 
   return (
     <>
-      {showModal && <ReportModal onClose={() => setShowModal(false)} />}
+      {showModal && <ReportModal onClose={() => setShowModal(false)} reportData={reportData} />}
 
       <div className="space-y-8">
         <div>

@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trophy, Medal, Award } from "lucide-react"; // Assuming M4 installed lucide-react
-
+import { Trophy, Medal, Award, AlertCircle, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { fallbackLeaderboard } from "@/lib/fallback-data";
 
 const getLeaderboard = async () => {
   const { data, error } = await supabase
@@ -34,17 +34,18 @@ const badges = [
 export default function GamificationPage() {
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isOffline, setIsOffline] = useState(false);
   
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        // In reality: const data = await getLeaderboard() from M1
         const data = await getLeaderboard();
-        // Sort by XP DESC to guarantee order
         const sorted = [...data].sort((a, b) => b.xp - a.xp);
         setLeaderboard(sorted);
       } catch (error) {
         console.error("Failed to load leaderboard", error);
+        setLeaderboard(fallbackLeaderboard);
+        setIsOffline(true);
       } finally {
         setLoading(false);
       }

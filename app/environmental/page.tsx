@@ -82,6 +82,14 @@ export default function EnvironmentalGoals() {
 
   const handleCreateOrder = (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (itemQuantity <= 0 || isNaN(itemQuantity)) {
+      toast.error("Invalid Quantity", {
+        description: "Purchase quantity must be a positive number greater than 0.",
+      })
+      return
+    }
+    
     // Open the nudge popup if they haven't opted for the green alternative
     if (!selectedAlternative) {
       setIsNudgeOpen(true)
