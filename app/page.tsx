@@ -17,6 +17,7 @@ import {
   ShieldAlert,
 } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 const stats = [
   {
@@ -119,6 +120,7 @@ function getCategoryVariant(category: string) {
 }
 
 export default function DashboardPage() {
+  const router = useRouter()
   return (
     <div className="space-y-8">
       {/* Hero Header */}
@@ -137,8 +139,8 @@ export default function DashboardPage() {
         <Tabs defaultValue="dashboard" className="w-[300px]">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="dashboard">Overview</TabsTrigger>
-            <TabsTrigger value="analytics" asChild>
-              <Link href="/reports">Reports</Link>
+            <TabsTrigger value="analytics" onClick={() => router.push('/reports')}>
+              Reports
             </TabsTrigger>
           </TabsList>
         </Tabs>
